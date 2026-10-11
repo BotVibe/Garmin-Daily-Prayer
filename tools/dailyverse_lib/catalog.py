@@ -41,3 +41,29 @@ def all_translation_codes(catalog: dict[str, list[str]] | None = None) -> set[st
     for codes in cat.values():
         out.update(codes)
     return out
+
+
+def setting_codes(catalog: dict[str, list[str]] | None = None) -> list[str]:
+    """Mirror Translations.settingCodeForIndex: index 0 is random, then catalog order."""
+    cat = catalog if catalog is not None else extract_catalog()
+    out = ["random"]
+    for lang in extract_language_ids():
+        out.extend(cat[lang])
+    return out
+
+
+def setting_code_index(code: str, catalog: dict[str, list[str]] | None = None) -> int:
+    """Mirror Translations.indexForSettingCode; unknown codes fall back to random."""
+    codes = setting_codes(catalog)
+    try:
+        return codes.index(code)
+    except ValueError:
+        return 0
+
+
+def language_index(lang_id: str) -> int:
+    """Mirror Translations.indexForLanguageId; unknown ids fall back to German."""
+    langs = extract_language_ids()
+    if lang_id in langs:
+        return langs.index(lang_id)
+    return langs.index("de")

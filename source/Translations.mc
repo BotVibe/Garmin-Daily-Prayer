@@ -21,6 +21,74 @@ module Translations {
         return langId;
     }
 
+    //! Garmin Connect settings only support numeric list entries, so language and
+    //! translation are persisted as catalog positions. The order below is append-only:
+    //! inserting in the middle would re-interpret values already stored on a watch.
+
+    function languageIdForIndex(index as Number) as String {
+        var ids = languageIds();
+        if (index < 0 || index >= ids.size()) {
+            return "de";
+        }
+        return ids[index] as String;
+    }
+
+    function indexForLanguageId(langId as String) as Number {
+        var ids = languageIds();
+        for (var i = 0; i < ids.size(); i++) {
+            if ((ids[i] as String).equals(langId)) {
+                return i;
+            }
+        }
+        return indexForLanguageId("de");
+    }
+
+    //! Settings index 0 is "random"; 1..n walk the catalog in languageIds() order.
+    function settingCodeForIndex(index as Number) as String {
+        if (index <= 0) {
+            return RANDOM_CODE;
+        }
+        var remaining = index - 1;
+        var ids = languageIds();
+        for (var i = 0; i < ids.size(); i++) {
+            var codes = codesForLanguage(ids[i] as String);
+            if (remaining < codes.size()) {
+                return codes[remaining] as String;
+            }
+            remaining -= codes.size();
+        }
+        return RANDOM_CODE;
+    }
+
+    function indexForSettingCode(code as String) as Number {
+        if (code.equals(RANDOM_CODE)) {
+            return 0;
+        }
+        var offset = 1;
+        var ids = languageIds();
+        for (var i = 0; i < ids.size(); i++) {
+            var codes = codesForLanguage(ids[i] as String);
+            for (var j = 0; j < codes.size(); j++) {
+                if ((codes[j] as String).equals(code)) {
+                    return offset + j;
+                }
+            }
+            offset += codes.size();
+        }
+        return 0;
+    }
+
+    //! True when the code belongs to the language (never true for "random").
+    function isCodeInLanguage(langId as String, code as String) as Boolean {
+        var codes = codesForLanguage(langId);
+        for (var i = 0; i < codes.size(); i++) {
+            if ((codes[i] as String).equals(code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     //! Translation codes available for a language (never includes "random").
     function codesForLanguage(langId as String) as Array<String> {
         if (langId.equals("af")) {

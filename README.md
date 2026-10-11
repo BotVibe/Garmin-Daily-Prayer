@@ -1,10 +1,11 @@
-# Spruch des Tages (Daily Verse)
+# Daily Verse
 
-Energieeffiziente **Garmin Connect IQ Watch-App**, die den Bibelvers des Tages von [DailyVerses.net](https://dailyverses.net/) lädt, zu konfigurierbaren Uhrzeiten erinnert und den Vers auf der Uhr anzeigt.
+Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lädt den Vers des Tages von [DailyVerses.net](https://dailyverses.net/), erinnert zu konfigurierbaren Uhrzeiten und zeigt den Vers auf der Uhr. Der Name der App ist in jeder Sprache **Daily Verse**. Version **1.0.0**, kostenlos.
 
 | | |
 | --- | --- |
 | Typ | Connect IQ **watch-app** (Apps-Menü) |
+| Version | **1.0.0** |
 | API | `https://dailyverses.net/get/verse?language=<code>` |
 | Min. API | Connect IQ **4.0.0** |
 | Sprachen UI | Deutsch (Default), Englisch |
@@ -60,14 +61,15 @@ Menü-Taste → Einstellungen / Aktualisieren
 
 ### Garmin Connect Mobile
 
-Dieselben Properties (`languageId`, `translationCode`, Slot-Flags/Zeiten) sind unter den App-Einstellungen spiegelbar. Die Übersetzungsliste in Connect ist flach (alle Codes); ungültige Kombinationen werden on-device auf eine gültige Übersetzung der Sprache zurückgesetzt.
+Dieselben Properties (`languageIndex`, `translationIndex`, Slot-Flags/Zeiten) sind unter den App-Einstellungen spiegelbar. Garmin Connect akzeptiert in Auswahllisten nur Zahlen, deshalb speichert die App Katalog-Positionen statt der Codes: `0` ist „Zufällig“, danach folgen die Übersetzungen in der Reihenfolge von `Translations.languageIds()`. Eine Kombination, die nicht zur gewählten Sprache passt, setzt die App auf die Standard-Übersetzung dieser Sprache zurück. Die Versionszeile ist dort nur lesbar.
 
 ### Defaults
 
 | Property | Default |
 | --- | --- |
-| Sprache | `de` (Deutsch) |
-| Übersetzung | `lut` (Luther 2017) |
+| Sprache | `languageIndex` **6** → `de` (Deutsch) |
+| Übersetzung | `translationIndex` **13** → `lut` (Luther 2017) |
+| Version | `appVersion` `1.0.0` (nur Anzeige) |
 | Slot 1 | **an**, 08:00 |
 | Slot 2 | aus, 12:00 |
 | Slot 3 | aus, 20:00 |
@@ -90,11 +92,11 @@ Und der HERR wird König sein über die ganze Erde; …
 Sacharja 14:9
 ```
 
-Der Parameter `language` ist bei DailyVerses der **Übersetzungscode** (z. B. `lut`, `niv`, `elb`), nicht der ISO-Sprachcode. Die App mappt intern `languageId` → erlaubte Codes.
+Der Parameter `language` ist bei DailyVerses der **Übersetzungscode** (z. B. `lut`, `niv`, `elb`), nicht der ISO-Sprachcode. Die App mappt intern die gespeicherte Sprach-Position auf die erlaubten Codes.
 
 ### Zufällige Übersetzung
 
-Wenn `translationCode = random`, wählt die App deterministisch für den aktuellen Kalendertag einen Code aus der Liste der gewählten Sprache und cached das Ergebnis. So bleibt der Vers am selben Tag stabil.
+Wenn die Übersetzung auf „Zufällig“ steht (`translationIndex` 0, intern `random`), wählt die App deterministisch für den aktuellen Kalendertag einen Code aus der Liste der gewählten Sprache und cached das Ergebnis. So bleibt der Vers am selben Tag stabil.
 
 ### Sprachen & Codes
 
@@ -147,13 +149,13 @@ source/
 
 Moderne runde Uhren (Auswahl):
 
-- fēnix 7 / 7S / 7X / Pro-Varianten  
-- fēnix 8 (43/47, Pro, Solar)  
-- epix (Gen 2) / Pro  
-- Forerunner 255 / 265 / 955 / 965  
-- Venu 2 / 2S / 2 Plus / 3 / 3S  
+- fēnix 7 / 7S / 7X und die Pro-Modelle
+- fēnix 8 (43 mm, 47 mm, Pro 47 mm, Solar 47/51 mm)
+- epix (Gen 2) und epix Pro (42/47/51 mm)
+- Forerunner 255 / 255 Music / 255S / 265 / 955 / 965
+- Venu 2 / 2S / 2 Plus / 3 / 3S
 
-Vollständige IDs: [`manifest.xml`](manifest.xml).
+Vollständige IDs: [`manifest.xml`](manifest.xml). `fenix7pronowifi` und `fenix7xpronowifi` kennt SDK 9.2.0 nicht; die Pro-Modelle ohne dieses Suffix decken dieselben Uhren ab.
 
 ---
 
@@ -175,20 +177,30 @@ cd Garmin-Daily-Prayer   # bzw. Workspace-Root
 # In VS Code: Ordner öffnen, „Monkey C: Build for Device“ / Simulator
 ```
 
-### CLI (Beispiel)
+### CLI
+
+`scripts/build.sh`, `scripts/test.sh` und `scripts/export.sh` rechnen `ROOT` vom Speicherort des Skripts aus, nicht vom aktuellen Verzeichnis.
 
 ```bash
-monkeyc \
-  -f monkey.jungle \
-  -d fenix7 \
-  -o bin/DailyVerse.prg \
-  -y /path/to/developer_key
+export CIQ_SDK_HOME=~/connectiq-sdk          # Ordner mit bin/monkeyc
+export CIQ_DEVELOPER_KEY=~/.Garmin/ConnectIQ/developer_key.der
+
+scripts/test.sh                              # pytest, ohne Netz
+scripts/build.sh                             # jedes Produkt im Manifest
+scripts/build.sh fenix7                      # ein Gerät
+scripts/export.sh                            # signiertes export/DailyVerse.iq
 ```
+
+Geräte-Definitionen kommen aus dem Connect IQ SDK Manager (`~/.Garmin/ConnectIQ/Devices`). In CI lädt `scripts/fetch_devices.sh` dieselben Ordner aus öffentlichen Spiegeln. Den Schlüssel nie committen; für den Store muss es immer derselbe Schlüssel bleiben.
+
+Launcher-Icons liegen größenrichtig unter `resources/drawables` (40 px) und `resources-icon-*`. Neu zeichnen: `python3 tools/gen_icons.py`. Die Connect-Settings erzeugt `python3 tools/gen_settings.py` aus `Translations.mc`.
+
+Vorlage für den Store-Upload: [`release/connectiq/BUILD_INFO.md`](release/connectiq/BUILD_INFO.md). Texte und Bilder: [`store/`](store/).
 
 ### Auf die Uhr
 
 - Sideload der `.prg` über Garmin Express / Connect IQ App, **oder**
-- Export als `.iq` und Upload in den Connect IQ Store (Developer).
+- `scripts/export.sh` und Upload der `.iq` in den Connect IQ Store.
 
 ### Simulator-Hinweise
 
@@ -219,7 +231,7 @@ pytest -m network      # optionaler Live-Call gegen DailyVerses.net
 python3 tools/verify_verse_parse.py   # Legacy-Smoke
 ```
 
-Die CI führt zuerst `pytest -m "not network"` aus (muss grün sein) und danach den Network-Smoke mit `continue-on-error` (Upstream-Ausfälle blockieren den Build nicht).
+Die CI führt zuerst `pytest -m "not network"` aus (muss grün sein) und danach den Network-Smoke mit `continue-on-error` (Upstream-Ausfälle blockieren den Build nicht). Ein zweiter Job lädt SDK 9.2.0 und kompiliert jedes Produkt im Manifest.
 
 ### Auto-Merge
 
@@ -265,5 +277,5 @@ Details und Checkliste: [`AGENTS.md`](AGENTS.md).
 
 ## Lizenz & Quellen
 
-- App-Code: siehe Repository-Lizenz (falls gesetzt) bzw. Projektrechte des Maintainers.
-- Versinhalte: © jeweilige Bibelübersetzung / [DailyVerses.net](https://dailyverses.net/). Bitte Nutzungsbedingungen von DailyVerses.net beachten.
+- App-Code: [MIT](LICENSE), Copyright Christof Rosentreter.
+- Die Verstexte lädt die App von [DailyVerses.net](https://dailyverses.net/). Die Bibelübersetzungen bleiben urheberrechtlich bei den jeweiligen Rechteinhabern.

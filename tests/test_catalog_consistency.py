@@ -1,12 +1,30 @@
 from __future__ import annotations
 
-import re
+import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from dailyverse_lib.catalog import all_translation_codes, extract_catalog, extract_language_ids
+from dailyverse_lib.catalog import (
+    all_translation_codes,
+    extract_catalog,
+    extract_language_ids,
+    language_index,
+    setting_code_index,
+    setting_codes,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
+SETTINGS_XML = ROOT / "resources/settings/settings.xml"
+
+
+def _list_entries(property_key: str) -> list[str]:
+    """Values of the listEntry elements of one <setting>, in document order."""
+    for setting in ET.parse(SETTINGS_XML).getroot().iter("setting"):
+        if setting.attrib.get("propertyKey") == f"@Properties.{property_key}":
+            config = setting.find("settingConfig")
+            assert config is not None
+            return [entry.attrib["value"] for entry in config.findall("listEntry")]
+    raise AssertionError(f"settings.xml has no setting for {property_key}")
 
 
 def _string_ids(path: Path) -> set[str]:
@@ -28,25 +46,34 @@ def test_every_language_has_at_least_one_translation() -> None:
 
 
 def test_settings_language_list_matches_catalog() -> None:
-    settings = (ROOT / "resources/settings/settings.xml").read_text(encoding="utf-8")
-    # First list block is languageId
-    lang_block = settings.split('propertyKey="@Properties.languageId"', 1)[1]
-    lang_block = lang_block.split('propertyKey="@Properties.translationCode"', 1)[0]
-    settings_langs = re.findall(r'listEntry value="([a-z]{2})"', lang_block)
-    assert settings_langs == extract_language_ids()
+    # Garmin Connect only accepts numeric list values, so the entries are the
+    # positions that Translations.languageIdForIndex resolves.
+    entries = _list_entries("languageIndex")
+    assert entries == [str(i) for i in range(len(extract_language_ids()))]
 
 
 def test_settings_translation_list_covers_catalog_and_random() -> None:
-    settings = (ROOT / "resources/settings/settings.xml").read_text(encoding="utf-8")
-    code_block = settings.split('propertyKey="@Properties.translationCode"', 1)[1]
-    code_block = code_block.split('propertyKey="@Properties.slot1Enabled"', 1)[0]
-    settings_codes = set(re.findall(r'listEntry value="([a-z0-9_]+)"', code_block))
-    catalog_codes = all_translation_codes()
-    assert "random" in settings_codes
-    missing = catalog_codes - settings_codes
-    assert not missing, f"settings.xml missing translation codes: {sorted(missing)}"
-    extra = settings_codes - catalog_codes - {"random"}
-    assert not extra, f"settings.xml has unknown codes: {sorted(extra)}"
+    entries = _list_entries("translationIndex")
+    codes = setting_codes()
+    assert entries == [str(i) for i in range(len(codes))]
+    # Index 0 is "random"; the rest must be exactly the catalog codes.
+    assert codes[0] == "random"
+    assert set(codes[1:]) == all_translation_codes()
+
+
+def test_setting_indices_round_trip() -> None:
+    for index, code in enumerate(setting_codes()):
+        assert setting_code_index(code) == index
+    for index, lang in enumerate(extract_language_ids()):
+        assert language_index(lang) == index
+
+
+def test_generated_settings_xml_is_committed() -> None:
+    # tools/gen_settings.py owns settings.xml; a stale file would ship wrong indices.
+    sys.path.insert(0, str(ROOT / "tools"))
+    import gen_settings
+
+    assert gen_settings.render() == SETTINGS_XML.read_text(encoding="utf-8")
 
 
 def test_string_resources_cover_all_languages() -> None:
@@ -64,10 +91,12 @@ def test_default_properties_are_valid() -> None:
     props = ET.parse(ROOT / "resources/properties/properties.xml").getroot()
     values = {el.attrib["id"]: (el.text or "").strip() for el in props.findall("property")}
     catalog = extract_catalog()
-    assert values["languageId"] in catalog
-    assert values["translationCode"] in catalog[values["languageId"]] or values[
-        "translationCode"
-    ] == "random"
+
+    default_lang = extract_language_ids()[int(values["languageIndex"])]
+    default_code = setting_codes()[int(values["translationIndex"])]
+    assert default_lang in catalog
+    assert default_code == "random" or default_code in catalog[default_lang]
+
     for slot in (1, 2, 3):
         hour = int(values[f"slot{slot}Hour"])
         minute = int(values[f"slot{slot}Minute"])

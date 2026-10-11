@@ -16,7 +16,9 @@ class BackgroundService extends System.ServiceDelegate {
         ReminderScheduler.scheduleNext();
 
         try {
-            Background.requestApplicationWake("Spruch des Tages");
+            // Resources are unavailable in the background process, so the app name
+            // is inlined here. Keep it in sync with @Strings.AppName.
+            Background.requestApplicationWake("Daily Verse");
         } catch (e) {
             // ignore — still exit cleanly
         }

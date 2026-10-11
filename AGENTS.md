@@ -1,4 +1,4 @@
-# AGENTS.md — Spruch des Tages (Garmin Connect IQ)
+# AGENTS.md — Daily Verse (Garmin Connect IQ)
 
 Anweisungen für Menschen und Coding-Agents, die an diesem Repository arbeiten.
 
@@ -8,7 +8,7 @@ Anweisungen für Menschen und Coding-Agents, die an diesem Repository arbeiten.
 
 Connect IQ **watch-app**, die:
 
-- den **Spruch des Tages** von DailyVerses.net lädt,
+- den **Bibelvers des Tages** (App-Name in jeder Sprache: **Daily Verse**) von DailyVerses.net lädt,
 - zu bis zu **3** konfigurierbaren Uhrzeiten per `requestApplicationWake` fragt (Annehmen/Ablehnen),
 - bei Annehmen den Vers zeigt und bei Ablehnen nichts tut,
 - den Vers auch **manuell** aus dem Apps-Menü zeigt,
@@ -26,8 +26,8 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 3. **Ablehnen = Idle.** Kein automatisches erneutes Öffnen; nächste Erinnerung trotzdem planen (im Background vor/bei Wake).
 4. **Zurück/Select in VerseView beendet die App** (`System.exit`) → normales Watchface.
 5. **API:** Plaintext `https://dailyverses.net/get/verse?language=<code>`. Der Website-`verse.js`-Embed ist dokumentiert, aber nicht der Primärpfad.
-6. **`language` Query-Param = Übersetzungscode** (z. B. `lut`), nicht ISO-Sprachcode. ISO liegt in Property `languageId`.
-7. **`translationCode = random`:** stabile Tageswahl aus Codes der Sprache; Ergebnis cachen.
+6. **`language` Query-Param = Übersetzungscode** (z. B. `lut`), nicht ISO-Sprachcode. Gespeichert wird die Katalog-Position `languageIndex`.
+7. **Übersetzung „Zufällig“** (`translationIndex` 0, intern `random`): stabile Tageswahl aus Codes der Sprache; Ergebnis cachen.
 8. **Dokumentationspflicht:** Jede Verhaltens-/API-/Settings-/Geräte-Änderung aktualisiert **README.md und AGENTS.md in derselben Änderung**.
 
 ---
@@ -47,8 +47,12 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 | UI Settings | `source/SettingsMenu.mc` |
 | Strings | `resources/strings/strings.xml`, `resources-eng/strings/strings.xml` |
 | CI / Tests | `.github/workflows/ci.yml`, `tests/`, `tools/dailyverse_lib/`, `requirements-dev.txt` |
+| Build-Skripte | `scripts/build.sh`, `scripts/test.sh`, `scripts/export.sh`, `scripts/fetch_devices.sh` |
+| Store | `store/listing-de.md`, `store/listing-en.md`, `store/privacy-*.md`, `store/assets/` |
+| Release | `CHANGELOG.md`, `release/connectiq/BUILD_INFO.md`, `LICENSE` |
 | Auto-Merge | `.github/workflows/auto-merge.yml` (nach grüner CI → squash in `main`, keine Drafts) |
 | Parser-Smoke | `tools/verify_verse_parse.py` (nutzt `dailyverse_lib`) |
+| Icons / Settings | `tools/gen_icons.py`, `tools/gen_settings.py`, `tools/gen_screenshots.py` |
 | Docs | `README.md`, `AGENTS.md` |
 
 ### Background-Annotation
@@ -65,8 +69,9 @@ Keine `WatchUi`-Abhängigkeiten im Background-Pfad.
 
 | Key | Typ | Bedeutung |
 | --- | --- | --- |
-| `languageId` | string | Katalog-Sprache (`de`, `en`, …) |
-| `translationCode` | string | API-Code oder `random` |
+| `languageIndex` | number | Position in `Translations.languageIds()` (`6` = `de`) |
+| `translationIndex` | number | `0` = zufällig, sonst Position im Katalog (`13` = `lut`) |
+| `appVersion` | string | Angezeigte Version, nur lesbar in den Settings |
 | `slotNEnabled` | boolean | N = 1..3 |
 | `slotNHour` | number | 0–23 |
 | `slotNMinute` | number | 0–59 |
@@ -104,8 +109,9 @@ Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 
 ## Build / Test für Agents
 
-- In dieser Cloud-Umgebung ist das **Garmin SDK typischerweise nicht installiert**. Liefere gültiges Monkey-C-Projekt; dokumentiere Build in README.
-- **CI (GitHub Actions):** `.github/workflows/ci.yml` — Python 3.12, `pytest -m "not network"` (pflicht), Network-Smoke optional/`continue-on-error`.
+- Das Garmin SDK liegt nicht im Repo. Build über `scripts/build.sh` dokumentieren; CI installiert SDK 9.2.0 selbst.
+- **CI (GitHub Actions):** `.github/workflows/ci.yml` — Python 3.12, `pytest -m "not network"` (pflicht), Network-Smoke optional/`continue-on-error`, plus Compile mit SDK 9.2.0 für jedes Manifest-Produkt.
+- Lokal: `scripts/test.sh`, `scripts/build.sh`, `scripts/export.sh` (`ROOT` = Repo-Wurzel).
 - **Auto-Merge:** `.github/workflows/auto-merge.yml` — nach erfolgreicher CI werden Ready-PRs (nicht Draft) gegen `main` per Squash gemerged. PRs für Auto-Merge als non-draft belassen oder auf Ready stellen.
 - Lokal ohne SDK:
 
@@ -123,7 +129,11 @@ Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 - TemporalEvent: min. 5 Minuten; nur einer aktiv.
 - `requestApplicationWake` + `Background.exit` im Background-Kontext; Schedule der nächsten Zeit **nicht** vom Accept abhängig machen.
 - `makeWebRequest` braucht Phone-Link.
-- Ungültige `<iq:product id>` im Manifest brechen den Build — nur dokumentierte Device-IDs.
+- Ungültige `<iq:product id>` im Manifest brechen den Build — nur dokumentierte Device-IDs. SDK 9.2.0 kennt `fenix7pronowifi` und `fenix7xpronowifi` nicht.
+- `String` hat kein `trim()`. Whitespace in `VerseApi.trim` selbst entfernen.
+- Sprach-Ressourcen nicht per `eng.resourcePath` anhängen. Der Default-Jungle mappt `resources-<lang>` auf `base.lang.<lang>`.
+- Connect-Settings vom Typ `list` akzeptieren nur numerische `listEntry`-Werte. `settings.xml` kommt aus `tools/gen_settings.py`.
+- Layouts erzeugen Custom-Drawables mit einem Parameter-Dictionary. `initialize(params)` muss es an `Drawable.initialize` weiterreichen.
 
 ---
 

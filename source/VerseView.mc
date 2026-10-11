@@ -161,7 +161,7 @@ class VerseDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onBack() as Boolean {
-        System.exit();
+        dismiss();
         return true;
     }
 
@@ -171,8 +171,14 @@ class VerseDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onSelect() as Boolean {
-        System.exit();
+        dismiss();
         return true;
+    }
+
+    //! Both back and select leave the verse, which means leaving the app so the
+    //! watch returns to its watch face instead of idling in the app.
+    private function dismiss() as Void {
+        System.exit();
     }
 
     function onNextPage() as Boolean {

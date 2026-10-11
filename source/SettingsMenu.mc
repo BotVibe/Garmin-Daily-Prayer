@@ -37,6 +37,12 @@ class SettingsMainMenu extends WatchUi.Menu2 {
             :showVerse,
             null
         ));
+        addItem(new WatchUi.MenuItem(
+            WatchUi.loadResource(Rez.Strings.SettingAppVersion) as String,
+            WatchUi.loadResource(Rez.Strings.AppVersion) as String,
+            :version,
+            null
+        ));
     }
 
     function languageSubtitle() as String {
@@ -208,10 +214,8 @@ class RemindersMenuDelegate extends WatchUi.Menu2InputDelegate {
 }
 
 class SlotMenu extends WatchUi.Menu2 {
-    private var _slot as Number;
 
     function initialize(slot as Number) {
-        _slot = slot;
         Menu2.initialize({:title => slotTitle(slot)});
         var enabled = AppConfig.isSlotEnabled(slot);
         addItem(new WatchUi.ToggleMenuItem(

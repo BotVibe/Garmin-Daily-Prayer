@@ -1,8 +1,9 @@
 <strings>
-    <string id="AppName">Verse of the Day</string>
-    <string id="AppNameShort">Verse</string>
+    <string id="AppName">Daily Verse</string>
+    <string id="AppNameShort">Daily Verse</string>
+    <string id="AppVersion">1.0.0</string>
 
-    <string id="WakeMessage">Verse of the Day</string>
+    <string id="WakeMessage">Daily Verse</string>
     <string id="Loading">Loading verse…</string>
     <string id="OfflineCache">Offline – cached verse</string>
     <string id="ErrorFetch">Could not load the verse. Connect your phone and try again.</string>
@@ -15,6 +16,7 @@
     <string id="MenuShowVerse">Verse of the Day</string>
 
     <string id="SettingsTitle">Settings</string>
+    <string id="SettingAppVersion">Version</string>
     <string id="SettingLanguage">Language</string>
     <string id="SettingTranslation">Bible translation</string>
     <string id="TranslationRandom">Random (language)</string>

@@ -49,6 +49,7 @@ class DailyVerseApp extends Application.AppBase {
     }
 
     function onSettingsChanged() as Void {
+        AppConfig.normalize();
         ReminderScheduler.scheduleNext();
         WatchUi.requestUpdate();
     }

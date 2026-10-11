@@ -1,8 +1,9 @@
 <strings>
-    <string id="AppName">Spruch des Tages</string>
-    <string id="AppNameShort">Spruch</string>
+    <string id="AppName">Daily Verse</string>
+    <string id="AppNameShort">Daily Verse</string>
+    <string id="AppVersion">1.0.0</string>
 
-    <string id="WakeMessage">Spruch des Tages</string>
+    <string id="WakeMessage">Daily Verse</string>
     <string id="Loading">Lade Vers…</string>
     <string id="OfflineCache">Offline – gespeicherter Vers</string>
     <string id="ErrorFetch">Vers konnte nicht geladen werden. Telefon verbinden und erneut versuchen.</string>
@@ -15,6 +16,7 @@
     <string id="MenuShowVerse">Spruch des Tages</string>
 
     <string id="SettingsTitle">Einstellungen</string>
+    <string id="SettingAppVersion">Version</string>
     <string id="SettingLanguage">Sprache</string>
     <string id="SettingTranslation">Bibelübersetzung</string>
     <string id="TranslationRandom">Zufällig (Sprache)</string>

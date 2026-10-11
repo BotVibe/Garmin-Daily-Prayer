@@ -2,9 +2,17 @@
     <drawable id="verseBackground" class="BackgroundDrawable" />
     <label id="statusLabel" x="center" y="12%" font="Graphics.FONT_XTINY"
            justification="Graphics.TEXT_JUSTIFY_CENTER" color="Graphics.COLOR_LT_GRAY" text="" />
-    <text-area id="verseText" x="12%" y="20%" width="76%" height="52%"
-               font="Graphics.FONT_SMALL" justification="Graphics.TEXT_JUSTIFY_CENTER"
-               color="Graphics.COLOR_WHITE" text="" />
+    <!-- Font ladder: TextArea picks the largest size the whole verse fits into. -->
+    <text-area id="verseText" x="10%" y="19%" width="80%" height="54%"
+               justification="Graphics.TEXT_JUSTIFY_CENTER"
+               color="Graphics.COLOR_WHITE" text="">
+        <fonts>
+            <font>Graphics.FONT_MEDIUM</font>
+            <font>Graphics.FONT_SMALL</font>
+            <font>Graphics.FONT_TINY</font>
+            <font>Graphics.FONT_XTINY</font>
+        </fonts>
+    </text-area>
     <label id="refLabel" x="center" y="76%" font="Graphics.FONT_TINY"
            justification="Graphics.TEXT_JUSTIFY_CENTER" color="0xC8A060" text="" />
     <label id="versionLabel" x="center" y="86%" font="Graphics.FONT_XTINY"
