@@ -1,0 +1,12 @@
+<layout id="VerseLayout">
+    <drawable id="verseBackground" class="BackgroundDrawable" />
+    <label id="statusLabel" x="center" y="10%" font="Graphics.FONT_XTINY"
+           justification="Graphics.TEXT_JUSTIFY_CENTER" color="Graphics.COLOR_LT_GRAY" text="" />
+    <text-area id="verseText" x="14%" y="18%" width="72%" height="50%"
+               font="Graphics.FONT_SMALL" justification="Graphics.TEXT_JUSTIFY_CENTER"
+               color="Graphics.COLOR_WHITE" text="" />
+    <label id="refLabel" x="center" y="74%" font="Graphics.FONT_TINY"
+           justification="Graphics.TEXT_JUSTIFY_CENTER" color="0xC8A060" text="" />
+    <label id="versionLabel" x="center" y="85%" font="Graphics.FONT_XTINY"
+           justification="Graphics.TEXT_JUSTIFY_CENTER" color="Graphics.COLOR_LT_GRAY" text="" />
+</layout>

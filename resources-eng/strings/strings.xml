@@ -1,0 +1,70 @@
+<strings>
+    <string id="AppName">Verse of the Day</string>
+    <string id="AppNameShort">Verse</string>
+
+    <string id="WakeMessage">Verse of the Day</string>
+    <string id="Loading">Loading verse…</string>
+    <string id="OfflineCache">Offline – cached verse</string>
+    <string id="ErrorFetch">Could not load the verse. Connect your phone and try again.</string>
+    <string id="ErrorNoPhone">No phone connection.</string>
+    <string id="RetryHint">Menu → Refresh</string>
+    <string id="PressBack">Back to watch face</string>
+
+    <string id="MenuSettings">Settings</string>
+    <string id="MenuRefresh">Refresh</string>
+    <string id="MenuShowVerse">Verse of the Day</string>
+
+    <string id="SettingsTitle">Settings</string>
+    <string id="SettingLanguage">Language</string>
+    <string id="SettingTranslation">Bible translation</string>
+    <string id="TranslationRandom">Random (language)</string>
+    <string id="RemindersTitle">Reminders</string>
+    <string id="Slot1">Reminder 1</string>
+    <string id="Slot2">Reminder 2</string>
+    <string id="Slot3">Reminder 3</string>
+    <string id="SlotEnabled">On</string>
+    <string id="SlotDisabled">Off</string>
+    <string id="SlotHour">Hour</string>
+    <string id="SlotMinute">Minute</string>
+    <string id="On">On</string>
+    <string id="Off">Off</string>
+
+    <string id="SettingSlot1Enabled">Reminder 1 enabled</string>
+    <string id="SettingSlot1Hour">Reminder 1 – hour</string>
+    <string id="SettingSlot1Minute">Reminder 1 – minute</string>
+    <string id="SettingSlot2Enabled">Reminder 2 enabled</string>
+    <string id="SettingSlot2Hour">Reminder 2 – hour</string>
+    <string id="SettingSlot2Minute">Reminder 2 – minute</string>
+    <string id="SettingSlot3Enabled">Reminder 3 enabled</string>
+    <string id="SettingSlot3Hour">Reminder 3 – hour</string>
+    <string id="SettingSlot3Minute">Reminder 3 – minute</string>
+
+    <string id="Lang_af">Afrikaans</string>
+    <string id="Lang_ar">Arabic</string>
+    <string id="Lang_bn">Bengali</string>
+    <string id="Lang_zh">Chinese (traditional)</string>
+    <string id="Lang_cs">Czech</string>
+    <string id="Lang_da">Danish</string>
+    <string id="Lang_de">German</string>
+    <string id="Lang_en">English</string>
+    <string id="Lang_es">Spanish</string>
+    <string id="Lang_fa">Persian</string>
+    <string id="Lang_fi">Finnish</string>
+    <string id="Lang_fr">French</string>
+    <string id="Lang_el">Greek</string>
+    <string id="Lang_hi">Hindi</string>
+    <string id="Lang_hu">Hungarian</string>
+    <string id="Lang_it">Italian</string>
+    <string id="Lang_mg">Malagasy</string>
+    <string id="Lang_nl">Dutch</string>
+    <string id="Lang_no">Norwegian</string>
+    <string id="Lang_pl">Polish</string>
+    <string id="Lang_pt">Portuguese</string>
+    <string id="Lang_ru">Russian</string>
+    <string id="Lang_sk">Slovak</string>
+    <string id="Lang_st">Southern Sotho</string>
+    <string id="Lang_sv">Swedish</string>
+    <string id="Lang_ur">Urdu</string>
+    <string id="Lang_xh">Xhosa</string>
+    <string id="Lang_zu">Zulu</string>
+</strings>

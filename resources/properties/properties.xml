@@ -1,0 +1,18 @@
+<properties>
+    <!-- Language key used in Translations.mc (e.g. de, en, nl) -->
+    <property id="languageId" type="string">de</property>
+    <!-- Translation code for dailyverses.net, or "random" -->
+    <property id="translationCode" type="string">lut</property>
+
+    <property id="slot1Enabled" type="boolean">true</property>
+    <property id="slot1Hour" type="number">8</property>
+    <property id="slot1Minute" type="number">0</property>
+
+    <property id="slot2Enabled" type="boolean">false</property>
+    <property id="slot2Hour" type="number">12</property>
+    <property id="slot2Minute" type="number">0</property>
+
+    <property id="slot3Enabled" type="boolean">false</property>
+    <property id="slot3Hour" type="number">20</property>
+    <property id="slot3Minute" type="number">0</property>
+</properties>

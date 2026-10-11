@@ -1,0 +1,223 @@
+import Toybox.Communications;
+import Toybox.Lang;
+import Toybox.System;
+
+//! Fetches and parses the DailyVerses.net plaintext verse endpoint.
+module VerseApi {
+
+    typedef VerseCallback as Method(success as Boolean, text as String?, reference as String?, apiCode as String?, error as String?) as Void;
+
+    class Request {
+        private var _callback as VerseCallback;
+        private var _apiCode as String;
+        private var _langId as String;
+        private var _settingCode as String;
+
+        function initialize(langId as String, settingCode as String, callback as VerseCallback) {
+            _callback = callback;
+            _langId = langId;
+            _settingCode = settingCode;
+            _apiCode = Translations.resolveApiCode(langId, settingCode, VerseCache.todayKey());
+        }
+
+        function start() as Void {
+            if (!(Communications has :makeWebRequest)) {
+                _callback.invoke(false, null, null, null, "no_comms");
+                return;
+            }
+
+            var url = "https://dailyverses.net/get/verse";
+            var params = {
+                "language" => _apiCode
+            };
+            var options = {
+                :method => Communications.HTTP_REQUEST_METHOD_GET,
+                :headers => {
+                    "Accept" => "text/plain, text/html, */*"
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_TEXT_PLAIN
+            };
+
+            try {
+                Communications.makeWebRequest(url, params, options, method(:onReceive));
+            } catch (e) {
+                _callback.invoke(false, null, null, null, "request_failed");
+            }
+        }
+
+        function onReceive(responseCode as Number, data as Dictionary or String or Null) as Void {
+            if (responseCode != 200 || data == null) {
+                var err = "http_" + responseCode.toString();
+                // Negative / transport failures typically mean phone/network unavailable
+                if (responseCode < 0) {
+                    err = "no_phone";
+                }
+                _callback.invoke(false, null, null, null, err);
+                return;
+            }
+
+            var body = data as String;
+            var parsed = parseVerseBody(body);
+            if (parsed == null) {
+                _callback.invoke(false, null, null, null, "parse");
+                return;
+            }
+
+            var text = parsed["text"] as String;
+            var reference = parsed["ref"] as String;
+            VerseCache.save(text, reference, _apiCode, _langId, _settingCode);
+            _callback.invoke(true, text, reference, _apiCode, null);
+        }
+    }
+
+    //! Parse plaintext body: verse lines, then reference line.
+    function parseVerseBody(body as String) as Dictionary? {
+        if (body == null || body.length() == 0) {
+            return null;
+        }
+
+        // Strip possible HTML wrappers if the JS endpoint was hit by mistake
+        var cleaned = body;
+        if (cleaned.find("<") != null) {
+            cleaned = stripTags(cleaned);
+        }
+        cleaned = unescapeJs(cleaned);
+        cleaned = cleaned.trim();
+
+        var lines = splitLines(cleaned);
+        if (lines.size() == 0) {
+            return null;
+        }
+
+        // Last non-empty line is typically the reference (e.g. "Sacharja 14:9")
+        var refIdx = lines.size() - 1;
+        while (refIdx >= 0 && (lines[refIdx] as String).length() == 0) {
+            refIdx--;
+        }
+        if (refIdx < 0) {
+            return null;
+        }
+
+        var reference = (lines[refIdx] as String).trim();
+        // Drop trailing " - ELB" style suffixes if present
+        var dash = reference.find(" - ");
+        if (dash != null) {
+            reference = reference.substring(0, dash as Number).trim();
+        }
+
+        var textParts = [] as Array<String>;
+        for (var i = 0; i < refIdx; i++) {
+            var line = (lines[i] as String).trim();
+            if (line.length() > 0) {
+                textParts.add(line);
+            }
+        }
+        if (textParts.size() == 0) {
+            // Single-line response: treat entire body as text, unknown ref
+            return {
+                "text" => cleaned,
+                "ref" => ""
+            } as Dictionary;
+        }
+
+        var text = joinLines(textParts);
+        return {
+            "text" => text,
+            "ref" => reference
+        } as Dictionary;
+    }
+
+    function splitLines(text as String) as Array<String> {
+        var result = [] as Array<String>;
+        var start = 0;
+        var len = text.length();
+        for (var i = 0; i < len; i++) {
+            var ch = text.substring(i, i + 1);
+            if (ch.equals("\n") || ch.equals("\r")) {
+                if (i > start) {
+                    result.add(text.substring(start, i));
+                } else {
+                    result.add("");
+                }
+                // skip \r\n
+                if (ch.equals("\r") && i + 1 < len && text.substring(i + 1, i + 2).equals("\n")) {
+                    i++;
+                }
+                start = i + 1;
+            }
+        }
+        if (start < len) {
+            result.add(text.substring(start, len));
+        }
+        return result;
+    }
+
+    function joinLines(parts as Array<String>) as String {
+        var out = "";
+        for (var i = 0; i < parts.size(); i++) {
+            if (i > 0) {
+                out += " ";
+            }
+            out += parts[i] as String;
+        }
+        return out;
+    }
+
+    function stripTags(html as String) as String {
+        var out = "";
+        var inTag = false;
+        for (var i = 0; i < html.length(); i++) {
+            var ch = html.substring(i, i + 1);
+            if (ch.equals("<")) {
+                inTag = true;
+                // Insert newline between block-ish closes for structure
+                if (i + 2 < html.length()) {
+                    var peek = html.substring(i, i + 2);
+                    if (peek.equals("</")) {
+                        out += "\n";
+                    }
+                }
+            } else if (ch.equals(">")) {
+                inTag = false;
+            } else if (!inTag) {
+                out += ch;
+            }
+        }
+        return out;
+    }
+
+    function unescapeJs(text as String) as String {
+        var out = text;
+        // Common unicode escapes from verse.js
+        out = replaceAll(out, "\\u003c", "<");
+        out = replaceAll(out, "\\u003e", ">");
+        out = replaceAll(out, "\\u0026", "&");
+        out = replaceAll(out, "\\\"", "\"");
+        out = replaceAll(out, "\\'", "'");
+        out = replaceAll(out, "&nbsp;", " ");
+        out = replaceAll(out, "&amp;", "&");
+        out = replaceAll(out, "&quot;", "\"");
+        out = replaceAll(out, "&#39;", "'");
+        return out;
+    }
+
+    function replaceAll(text as String, from as String, to as String) as String {
+        if (from.length() == 0) {
+            return text;
+        }
+        var out = "";
+        var i = 0;
+        while (i < text.length()) {
+            var idx = text.substring(i, text.length()).find(from);
+            if (idx == null) {
+                out += text.substring(i, text.length());
+                break;
+            }
+            var at = i + (idx as Number);
+            out += text.substring(i, at);
+            out += to;
+            i = at + from.length();
+        }
+        return out;
+    }
+}

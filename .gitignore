@@ -1,0 +1,21 @@
+# Connect IQ build artifacts
+bin/
+gen/
+*.prg
+*.iq
+*.mir
+*.mb
+*.debug.xml
+export/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local SDK / secrets
+developer_key*
+*.jungle.local
+.env
