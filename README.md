@@ -221,6 +221,14 @@ python3 tools/verify_verse_parse.py   # Legacy-Smoke
 
 Die CI führt zuerst `pytest -m "not network"` aus (muss grün sein) und danach den Network-Smoke mit `continue-on-error` (Upstream-Ausfälle blockieren den Build nicht).
 
+### Auto-Merge
+
+Workflow [`.github/workflows/auto-merge.yml`](.github/workflows/auto-merge.yml):
+
+- Läuft nach erfolgreicher **CI**-Workflow-Ausführung
+- Squash-merged offene, **nicht-draft** PRs gegen `main`, deren Head-SHA dem grünen CI-Lauf entspricht
+- Draft-PRs werden übersprungen (zuerst „Ready for review“)
+
 ---
 
 ## UX-Hinweise

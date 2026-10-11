@@ -47,6 +47,7 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 | UI Settings | `source/SettingsMenu.mc` |
 | Strings | `resources/strings/strings.xml`, `resources-eng/strings/strings.xml` |
 | CI / Tests | `.github/workflows/ci.yml`, `tests/`, `tools/dailyverse_lib/`, `requirements-dev.txt` |
+| Auto-Merge | `.github/workflows/auto-merge.yml` (nach grüner CI → squash in `main`, keine Drafts) |
 | Parser-Smoke | `tools/verify_verse_parse.py` (nutzt `dailyverse_lib`) |
 | Docs | `README.md`, `AGENTS.md` |
 
@@ -105,6 +106,7 @@ Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 
 - In dieser Cloud-Umgebung ist das **Garmin SDK typischerweise nicht installiert**. Liefere gültiges Monkey-C-Projekt; dokumentiere Build in README.
 - **CI (GitHub Actions):** `.github/workflows/ci.yml` — Python 3.12, `pytest -m "not network"` (pflicht), Network-Smoke optional/`continue-on-error`.
+- **Auto-Merge:** `.github/workflows/auto-merge.yml` — nach erfolgreicher CI werden Ready-PRs (nicht Draft) gegen `main` per Squash gemerged. PRs für Auto-Merge als non-draft belassen oder auf Ready stellen.
 - Lokal ohne SDK:
 
   ```bash

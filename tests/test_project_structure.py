@@ -25,6 +25,7 @@ REQUIRED_FILES = [
     "resources/layouts/verse.xml",
     "resources/drawables/launcher_icon.png",
     ".github/workflows/ci.yml",
+    ".github/workflows/auto-merge.yml",
 ]
 
 
