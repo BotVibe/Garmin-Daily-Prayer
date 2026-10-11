@@ -10,7 +10,7 @@ module ReminderScheduler {
 
     //! Register the next wake Moment. Safe to call from app or background.
     function scheduleNext() as Void {
-        if (!System has :ServiceDelegate) {
+        if (!(System has :ServiceDelegate)) {
             return;
         }
 

@@ -6,43 +6,49 @@ import Toybox.System;
 (:background)
 module AppConfig {
 
+    const KEY_LANGUAGE as String = "languageIndex";
+    const KEY_TRANSLATION as String = "translationIndex";
+
+    const DEFAULT_LANGUAGE_ID as String = "de";
+    const DEFAULT_TRANSLATION_CODE as String = "lut";
+
     function getLanguageId() as String {
-        var v = Application.Properties.getValue("languageId");
-        if (v instanceof String) {
-            return v as String;
+        var v = Application.Properties.getValue(KEY_LANGUAGE);
+        if (v instanceof Number) {
+            return Translations.languageIdForIndex(v as Number);
         }
-        return "de";
+        return DEFAULT_LANGUAGE_ID;
     }
 
     function setLanguageId(langId as String) as Void {
-        Application.Properties.setValue("languageId", langId);
+        Application.Properties.setValue(KEY_LANGUAGE, Translations.indexForLanguageId(langId));
         // Keep translation valid for the new language
         var code = getTranslationCode();
-        if (!code.equals(Translations.RANDOM_CODE)) {
-            var codes = Translations.codesForLanguage(langId);
-            var ok = false;
-            for (var i = 0; i < codes.size(); i++) {
-                if ((codes[i] as String).equals(code)) {
-                    ok = true;
-                    break;
-                }
-            }
-            if (!ok) {
-                setTranslationCode(Translations.defaultCode(langId));
-            }
+        if (!code.equals(Translations.RANDOM_CODE) && !Translations.isCodeInLanguage(langId, code)) {
+            setTranslationCode(Translations.defaultCode(langId));
         }
     }
 
     function getTranslationCode() as String {
-        var v = Application.Properties.getValue("translationCode");
-        if (v instanceof String) {
-            return v as String;
+        var v = Application.Properties.getValue(KEY_TRANSLATION);
+        if (v instanceof Number) {
+            return Translations.settingCodeForIndex(v as Number);
         }
-        return "lut";
+        return DEFAULT_TRANSLATION_CODE;
     }
 
     function setTranslationCode(code as String) as Void {
-        Application.Properties.setValue("translationCode", code);
+        Application.Properties.setValue(KEY_TRANSLATION, Translations.indexForSettingCode(code));
+    }
+
+    //! Garmin Connect lets language and translation be picked independently, so a
+    //! mismatched pair can arrive from the phone. Pull it back to a valid pair.
+    function normalize() as Void {
+        var langId = getLanguageId();
+        var code = getTranslationCode();
+        if (!code.equals(Translations.RANDOM_CODE) && !Translations.isCodeInLanguage(langId, code)) {
+            setTranslationCode(Translations.defaultCode(langId));
+        }
     }
 
     function isSlotEnabled(slot as Number) as Boolean {

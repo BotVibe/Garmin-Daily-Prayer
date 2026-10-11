@@ -4,8 +4,9 @@ import Toybox.WatchUi;
 
 //! Soft dark teal backdrop — low redraw cost, OLED-friendly.
 class BackgroundDrawable extends WatchUi.Drawable {
-    function initialize() {
-        Drawable.initialize({});
+    //! Layouts instantiate custom drawables with the generated parameter dictionary.
+    function initialize(params as Dictionary) {
+        Drawable.initialize(params);
     }
 
     function draw(dc as Graphics.Dc) as Void {

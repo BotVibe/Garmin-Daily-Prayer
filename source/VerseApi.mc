@@ -5,6 +5,9 @@ import Toybox.System;
 //! Fetches and parses the DailyVerses.net plaintext verse endpoint.
 module VerseApi {
 
+    //! Non-breaking space, which DailyVerses.net emits around references.
+    const NBSP as String = "\u00a0";
+
     typedef VerseCallback as Method(success as Boolean, text as String?, reference as String?, apiCode as String?, error as String?) as Void;
 
     class Request {
@@ -76,7 +79,7 @@ module VerseApi {
             return null;
         }
 
-        var cleaned = unescapeJs(body.trim());
+        var cleaned = unescapeJs(trim(body));
         // Prefer payload inside verse.js innerHTML = '...'
         var payload = extractInnerHtmlPayload(cleaned);
         if (payload != null) {
@@ -86,7 +89,7 @@ module VerseApi {
         if (cleaned.find("<") != null) {
             cleaned = stripTags(cleaned);
         }
-        cleaned = cleaned.trim();
+        cleaned = trim(cleaned);
 
         var lines = splitLines(cleaned);
         if (lines.size() == 0) {
@@ -106,7 +109,7 @@ module VerseApi {
         // Drop trailing " - ELB" style suffixes if present
         var dash = reference.find(" - ");
         if (dash != null) {
-            reference = reference.substring(0, dash as Number).trim();
+            reference = trim(reference.substring(0, dash as Number) as String);
         }
 
         var textParts = [] as Array<String>;
@@ -162,22 +165,50 @@ module VerseApi {
     }
 
     function sanitizeLine(line as String) as String {
-        var out = line.trim();
+        var out = trim(line);
         // Strip common JS/string artifacts from verse.js payloads
         while (out.length() > 0) {
             var first = out.substring(0, 1);
             var last = out.substring(out.length() - 1, out.length());
             if (first.equals("'") || first.equals("\"") || first.equals("`") || first.equals(";")) {
-                out = out.substring(1, out.length()).trim();
+                out = trim(out.substring(1, out.length()) as String);
                 continue;
             }
             if (last.equals("'") || last.equals("\"") || last.equals("`") || last.equals(";")) {
-                out = out.substring(0, out.length() - 1).trim();
+                out = trim(out.substring(0, out.length() - 1) as String);
                 continue;
             }
             break;
         }
         return out;
+    }
+
+    //! Monkey C's String has no trim(), so strip surrounding whitespace by hand.
+    function trim(text as String) as String {
+        var len = text.length();
+        var start = 0;
+        while (start < len && isWhitespace(text.substring(start, start + 1) as String)) {
+            start++;
+        }
+        var end = len;
+        while (end > start && isWhitespace(text.substring(end - 1, end) as String)) {
+            end--;
+        }
+        if (start == 0 && end == len) {
+            return text;
+        }
+        if (start >= end) {
+            return "";
+        }
+        return text.substring(start, end) as String;
+    }
+
+    function isWhitespace(ch as String) as Boolean {
+        return ch.equals(" ")
+            || ch.equals("\n")
+            || ch.equals("\r")
+            || ch.equals("\t")
+            || ch.equals(NBSP);
     }
 
     function splitLines(text as String) as Array<String> {

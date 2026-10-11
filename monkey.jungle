@@ -5,8 +5,8 @@ project.manifest = manifest.xml
 base.sourcePath = source
 base.resourcePath = resources
 
-# Language overlays (Garmin resource qualifier folders)
-eng.resourcePath = $(base.resourcePath);resources-eng
+# Language overlays. The default jungle already maps resources-<lang> folders
+# onto base.lang.<lang>, so resources-eng needs no explicit instruction here.
 
 # Round display size tweaks (padding / font scale via layouts)
 round-416x416.resourcePath = $(base.resourcePath);resources-round-416x416
