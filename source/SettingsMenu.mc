@@ -37,6 +37,12 @@ class SettingsMainMenu extends WatchUi.Menu2 {
             :showVerse,
             null
         ));
+        addItem(new WatchUi.MenuItem(
+            WatchUi.loadResource(Rez.Strings.SettingAppVersion) as String,
+            WatchUi.loadResource(Rez.Strings.AppVersion) as String,
+            :version,
+            null
+        ));
     }
 
     function languageSubtitle() as String {
