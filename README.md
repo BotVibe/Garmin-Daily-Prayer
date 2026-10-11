@@ -197,13 +197,29 @@ monkeyc \
 
 ---
 
-## Offline-Check (Parser)
+## Tests & CI
 
-Ohne Garmin SDK kann der API-Parser grob geprüft werden:
+Ohne Garmin SDK prüft die GitHub Actions Pipeline (`.github/workflows/ci.yml`) die logikkritischen Teile:
+
+| Suite | Inhalt |
+| --- | --- |
+| `tests/test_verse_parse.py` | Parser für Plaintext/HTML/JS-Antworten |
+| `tests/test_random_translation.py` | stabile Zufalls-Übersetzung pro Tag |
+| `tests/test_reminder_schedule.py` | nächste Erinnerungszeit (3 Slots, +5‑Min-Regel) |
+| `tests/test_catalog_consistency.py` | `Translations.mc` ↔ Settings ↔ Strings |
+| `tests/test_manifest.py` | Manifest, Permissions, Background-Invarianten |
+| `tests/test_project_structure.py` | Pflicht-Dateien & Doku-Hinweise |
+
+Lokal:
 
 ```bash
-python3 tools/verify_verse_parse.py
+python3 -m pip install -r requirements-dev.txt
+pytest                 # Offline-Unit-/Konsistenztests
+pytest -m network      # optionaler Live-Call gegen DailyVerses.net
+python3 tools/verify_verse_parse.py   # Legacy-Smoke
 ```
+
+Die CI führt zuerst `pytest -m "not network"` aus (muss grün sein) und danach den Network-Smoke mit `continue-on-error` (Upstream-Ausfälle blockieren den Build nicht).
 
 ---
 

@@ -76,12 +76,16 @@ module VerseApi {
             return null;
         }
 
-        // Strip possible HTML wrappers if the JS endpoint was hit by mistake
-        var cleaned = body;
+        var cleaned = unescapeJs(body.trim());
+        // Prefer payload inside verse.js innerHTML = '...'
+        var payload = extractInnerHtmlPayload(cleaned);
+        if (payload != null) {
+            cleaned = payload as String;
+            cleaned = unescapeJs(cleaned);
+        }
         if (cleaned.find("<") != null) {
             cleaned = stripTags(cleaned);
         }
-        cleaned = unescapeJs(cleaned);
         cleaned = cleaned.trim();
 
         var lines = splitLines(cleaned);
@@ -91,14 +95,14 @@ module VerseApi {
 
         // Last non-empty line is typically the reference (e.g. "Sacharja 14:9")
         var refIdx = lines.size() - 1;
-        while (refIdx >= 0 && (lines[refIdx] as String).length() == 0) {
+        while (refIdx >= 0 && sanitizeLine(lines[refIdx] as String).length() == 0) {
             refIdx--;
         }
         if (refIdx < 0) {
             return null;
         }
 
-        var reference = (lines[refIdx] as String).trim();
+        var reference = sanitizeLine(lines[refIdx] as String);
         // Drop trailing " - ELB" style suffixes if present
         var dash = reference.find(" - ");
         if (dash != null) {
@@ -107,7 +111,7 @@ module VerseApi {
 
         var textParts = [] as Array<String>;
         for (var i = 0; i < refIdx; i++) {
-            var line = (lines[i] as String).trim();
+            var line = sanitizeLine(lines[i] as String);
             if (line.length() > 0) {
                 textParts.add(line);
             }
@@ -125,6 +129,55 @@ module VerseApi {
             "text" => text,
             "ref" => reference
         } as Dictionary;
+    }
+
+    function extractInnerHtmlPayload(text as String) as String? {
+        var marker = "innerHTML";
+        var at = text.find(marker);
+        if (at == null) {
+            return null;
+        }
+        var from = (at as Number) + marker.length();
+        var quoteIdx = -1;
+        var quote = "";
+        for (var i = from; i < text.length(); i++) {
+            var ch = text.substring(i, i + 1);
+            if (ch.equals("'") || ch.equals("\"")) {
+                quoteIdx = i;
+                quote = ch;
+                break;
+            }
+        }
+        if (quoteIdx < 0) {
+            return null;
+        }
+        var start = quoteIdx + 1;
+        for (var j = start; j < text.length(); j++) {
+            var c = text.substring(j, j + 1);
+            if (c.equals(quote)) {
+                return text.substring(start, j);
+            }
+        }
+        return null;
+    }
+
+    function sanitizeLine(line as String) as String {
+        var out = line.trim();
+        // Strip common JS/string artifacts from verse.js payloads
+        while (out.length() > 0) {
+            var first = out.substring(0, 1);
+            var last = out.substring(out.length() - 1, out.length());
+            if (first.equals("'") || first.equals("\"") || first.equals("`") || first.equals(";")) {
+                out = out.substring(1, out.length()).trim();
+                continue;
+            }
+            if (last.equals("'") || last.equals("\"") || last.equals("`") || last.equals(";")) {
+                out = out.substring(0, out.length() - 1).trim();
+                continue;
+            }
+            break;
+        }
+        return out;
     }
 
     function splitLines(text as String) as Array<String> {

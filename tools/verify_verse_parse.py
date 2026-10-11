@@ -1,35 +1,16 @@
 #!/usr/bin/env python3
-"""Offline sanity checks mirroring VerseApi.parseVerseBody behaviour."""
+"""Backward-compatible smoke entrypoint; prefer `pytest` in CI."""
 
 from __future__ import annotations
 
-import re
 import sys
 import urllib.request
+from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
 
-def parse_verse_body(body: str) -> dict[str, str] | None:
-    if not body or not body.strip():
-        return None
-    cleaned = body
-    if "<" in cleaned:
-        cleaned = re.sub(r"<[^>]+>", "\n", cleaned)
-    cleaned = (
-        cleaned.replace("\\u003c", "<")
-        .replace("\\u003e", ">")
-        .replace("&nbsp;", " ")
-        .replace("&amp;", "&")
-        .strip()
-    )
-    lines = [ln.strip() for ln in cleaned.splitlines()]
-    lines = [ln for ln in lines if ln]
-    if not lines:
-        return None
-    reference = lines[-1]
-    if " - " in reference:
-        reference = reference.split(" - ", 1)[0].strip()
-    text = " ".join(lines[:-1]) if len(lines) > 1 else cleaned
-    return {"text": text, "ref": reference}
+from dailyverse_lib.parse import parse_verse_body  # noqa: E402
 
 
 def main() -> int:

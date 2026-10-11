@@ -46,7 +46,8 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 | UI Home (optional) | `source/HomeView.mc` (Default-Entry ist VerseView) |
 | UI Settings | `source/SettingsMenu.mc` |
 | Strings | `resources/strings/strings.xml`, `resources-eng/strings/strings.xml` |
-| Parser-Smoke | `tools/verify_verse_parse.py` |
+| CI / Tests | `.github/workflows/ci.yml`, `tests/`, `tools/dailyverse_lib/`, `requirements-dev.txt` |
+| Parser-Smoke | `tools/verify_verse_parse.py` (nutzt `dailyverse_lib`) |
 | Docs | `README.md`, `AGENTS.md` |
 
 ### Background-Annotation
@@ -81,7 +82,9 @@ Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 | --- | --- |
 | Neue Sprache / Übersetzung | `Translations.mc`, `settings.xml`, Strings (`Lang_*`), **README** (Tabelle), **AGENTS** (falls Invariante/Katalogbeschreibung) |
 | Erinnerungslogik / Slot-Anzahl | `AppConfig`, `ReminderScheduler`, `properties.xml`, `settings.xml`, Settings-UI, **README**, **AGENTS** |
-| API-URL oder Parse-Format | `VerseApi.mc`, `tools/verify_verse_parse.py`, **README**, **AGENTS** |
+| API-URL oder Parse-Format | `VerseApi.mc`, `tools/dailyverse_lib/parse.py`, `tests/test_verse_parse.py`, **README**, **AGENTS** |
+| Katalog Sprache/Übersetzung | `Translations.mc`, Settings/Strings, `tools/dailyverse_lib/catalog.py`, `tests/test_catalog_consistency.py`, **README**, **AGENTS** |
+| Reminder-Algorithmus | `ReminderScheduler.mc`, `tools/dailyverse_lib/reminder.py`, `tests/test_reminder_schedule.py`, **README**, **AGENTS** |
 | Neue Geräte | `manifest.xml`, **README** Geräte-Liste |
 | UI-Flow (Exit, Menü, Wake) | Views/Delegates, **README** Nutzerfluss, **AGENTS** Invarianten |
 | Default-Properties | `properties.xml`, **README** Defaults |
@@ -93,18 +96,24 @@ Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 - [ ] AGENTS-Invarianten stimmen noch
 - [ ] Dateizuordnung in AGENTS enthält neue wichtigen Dateien
 - [ ] Keine veralteten Widget-/Polling-Hinweise
+- [ ] CI-Tests / `dailyverse_lib` angepasst, falls Logik betroffen
+- [ ] `pytest -m "not network"` lokal grün
 
 ---
 
 ## Build / Test für Agents
 
 - In dieser Cloud-Umgebung ist das **Garmin SDK typischerweise nicht installiert**. Liefere gültiges Monkey-C-Projekt; dokumentiere Build in README.
-- Parser-Smoke ohne SDK:
+- **CI (GitHub Actions):** `.github/workflows/ci.yml` — Python 3.12, `pytest -m "not network"` (pflicht), Network-Smoke optional/`continue-on-error`.
+- Lokal ohne SDK:
 
   ```bash
+  pip install -r requirements-dev.txt
+  pytest -m "not network"
   python3 tools/verify_verse_parse.py
   ```
 
+- Python-Spiegel der Monkey-C-Logik liegen in `tools/dailyverse_lib/` und müssen bei Algorithmus-Änderungen mitgezogen werden.
 - Manuelle Gerätetests (lokal): Simulator Background Wake, Accept/Decline, Offline-Cache, Sprachwechsel, Random-Übersetzung über Mitternacht.
 
 ### Bekannte CIQ-Fallen
@@ -139,7 +148,7 @@ Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 1. Feature-Branch `cursor/<kurzname>-b565` (Cloud-Agent-Konvention).
 2. Änderungen implementieren.
 3. Docs mitziehen (README + AGENTS).
-4. `python3 tools/verify_verse_parse.py` wenn API/Parser betroffen.
-5. Commit mit klarer Message, push, PR.
+4. `pytest -m "not network"` (und bei Parser/API zusätzlich Network/Smoke).
+5. Commit mit klarer Message, push, PR — CI muss für Offline-Tests grün sein.
 
 Bei Unklarheiten: Invarianten in diesem File haben Vorrang vor kosmetischen Refactors.
