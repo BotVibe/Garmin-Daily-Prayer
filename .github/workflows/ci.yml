@@ -45,3 +45,44 @@ jobs:
 
       - name: Legacy smoke script
         run: python tools/verify_verse_parse.py
+
+  compile:
+    name: Connect IQ compile
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Connect IQ SDK 9.2.0
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/ciq-sdk.zip" \
+            https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-9.2.0-2026-06-09-92a1605b2.zip
+          unzip -q "$RUNNER_TEMP/ciq-sdk.zip" -d "$RUNNER_TEMP/ciq"
+          echo "CIQ_SDK_HOME=$RUNNER_TEMP/ciq" >> "$GITHUB_ENV"
+
+      - name: Install device definitions
+        run: scripts/fetch_devices.sh
+
+      - name: Throwaway developer key
+        run: |
+          openssl genrsa -out "$RUNNER_TEMP/developer_key.pem" 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER \
+            -in "$RUNNER_TEMP/developer_key.pem" \
+            -out "$RUNNER_TEMP/developer_key.der" -nocrypt
+          echo "CIQ_DEVELOPER_KEY=$RUNNER_TEMP/developer_key.der" >> "$GITHUB_ENV"
+
+      - name: Compile every manifest product
+        run: scripts/build.sh

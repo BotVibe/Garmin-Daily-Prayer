@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-    Daily Verse (Spruch des Tages) — Connect IQ watch-app manifest.
+    Daily Verse — Connect IQ watch-app manifest. Version 1.0.0.
     Target: modern round watches (CIQ 4.0+).
 -->
 <iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="3">
