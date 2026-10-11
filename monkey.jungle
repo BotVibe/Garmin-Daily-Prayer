@@ -1,0 +1,15 @@
+# Daily Verse — Connect IQ jungle project file
+project.manifest = manifest.xml
+
+# Base resources for all devices
+base.sourcePath = source
+base.resourcePath = resources
+
+# Language overlays (Garmin resource qualifier folders)
+eng.resourcePath = $(base.resourcePath);resources-eng
+
+# Round display size tweaks (padding / font scale via layouts)
+round-416x416.resourcePath = $(base.resourcePath);resources-round-416x416
+round-390x390.resourcePath = $(base.resourcePath);resources-round-390x390
+round-454x454.resourcePath = $(base.resourcePath);resources-round-454x454
+round-360x360.resourcePath = $(base.resourcePath);resources-round-360x360

@@ -1,0 +1,129 @@
+<settings>
+    <setting propertyKey="@Properties.languageId" title="@Strings.SettingLanguage">
+        <settingConfig type="list">
+            <listEntry value="af">@Strings.Lang_af</listEntry>
+            <listEntry value="ar">@Strings.Lang_ar</listEntry>
+            <listEntry value="bn">@Strings.Lang_bn</listEntry>
+            <listEntry value="zh">@Strings.Lang_zh</listEntry>
+            <listEntry value="cs">@Strings.Lang_cs</listEntry>
+            <listEntry value="da">@Strings.Lang_da</listEntry>
+            <listEntry value="de">@Strings.Lang_de</listEntry>
+            <listEntry value="en">@Strings.Lang_en</listEntry>
+            <listEntry value="es">@Strings.Lang_es</listEntry>
+            <listEntry value="fa">@Strings.Lang_fa</listEntry>
+            <listEntry value="fi">@Strings.Lang_fi</listEntry>
+            <listEntry value="fr">@Strings.Lang_fr</listEntry>
+            <listEntry value="el">@Strings.Lang_el</listEntry>
+            <listEntry value="hi">@Strings.Lang_hi</listEntry>
+            <listEntry value="hu">@Strings.Lang_hu</listEntry>
+            <listEntry value="it">@Strings.Lang_it</listEntry>
+            <listEntry value="mg">@Strings.Lang_mg</listEntry>
+            <listEntry value="nl">@Strings.Lang_nl</listEntry>
+            <listEntry value="no">@Strings.Lang_no</listEntry>
+            <listEntry value="pl">@Strings.Lang_pl</listEntry>
+            <listEntry value="pt">@Strings.Lang_pt</listEntry>
+            <listEntry value="ru">@Strings.Lang_ru</listEntry>
+            <listEntry value="sk">@Strings.Lang_sk</listEntry>
+            <listEntry value="st">@Strings.Lang_st</listEntry>
+            <listEntry value="sv">@Strings.Lang_sv</listEntry>
+            <listEntry value="ur">@Strings.Lang_ur</listEntry>
+            <listEntry value="xh">@Strings.Lang_xh</listEntry>
+            <listEntry value="zu">@Strings.Lang_zu</listEntry>
+        </settingConfig>
+    </setting>
+
+    <!-- Flat list of all translation codes + random; on-device menu filters by language. -->
+    <setting propertyKey="@Properties.translationCode" title="@Strings.SettingTranslation">
+        <settingConfig type="list">
+            <listEntry value="random">@Strings.TranslationRandom</listEntry>
+            <listEntry value="afr53">AFR53</listEntry>
+            <listEntry value="avd">AVD</listEntry>
+            <listEntry value="keh">KEH</listEntry>
+            <listEntry value="rovu">ROVU</listEntry>
+            <listEntry value="cuv">CUV</listEntry>
+            <listEntry value="cuvs">CUVS</listEntry>
+            <listEntry value="b21">B21</listEntry>
+            <listEntry value="cep">CEP</listEntry>
+            <listEntry value="bdan">BDAN</listEntry>
+            <listEntry value="da1871">DA1871</listEntry>
+            <listEntry value="elb">ELB</listEntry>
+            <listEntry value="lu12">LU12</listEntry>
+            <listEntry value="lut">LUT</listEntry>
+            <listEntry value="neu">NeÜ</listEntry>
+            <listEntry value="esv">ESV</listEntry>
+            <listEntry value="kjv">KJV</listEntry>
+            <listEntry value="nasb">NASB</listEntry>
+            <listEntry value="ncb">NCB</listEntry>
+            <listEntry value="niv">NIV</listEntry>
+            <listEntry value="nkjv">NKJV</listEntry>
+            <listEntry value="nlt">NLT</listEntry>
+            <listEntry value="nrsv">NRSV</listEntry>
+            <listEntry value="web">WEB</listEntry>
+            <listEntry value="lbla">LBLA</listEntry>
+            <listEntry value="nvi">NVI</listEntry>
+            <listEntry value="rvr60">RVR60</listEntry>
+            <listEntry value="rvr95">RVR95</listEntry>
+            <listEntry value="pcb">PCB</listEntry>
+            <listEntry value="kr38">KR38</listEntry>
+            <listEntry value="kr92">KR92</listEntry>
+            <listEntry value="bds">BDS</listEntry>
+            <listEntry value="neg79">NEG79</listEntry>
+            <listEntry value="sg21">SG21</listEntry>
+            <listEntry value="tgv">TGV</listEntry>
+            <listEntry value="hhbd">HHBD</listEntry>
+            <listEntry value="uf">UF</listEntry>
+            <listEntry value="cei">CEI</listEntry>
+            <listEntry value="lnd">LND</listEntry>
+            <listEntry value="nr06">NR06</listEntry>
+            <listEntry value="mg1865">MG1865</listEntry>
+            <listEntry value="bb">BB</listEntry>
+            <listEntry value="bgt">BGT</listEntry>
+            <listEntry value="hsv">HSV</listEntry>
+            <listEntry value="nbg">NBG</listEntry>
+            <listEntry value="nbv">NBV</listEntry>
+            <listEntry value="b2024">B2024</listEntry>
+            <listEntry value="bw1975">BW1975</listEntry>
+            <listEntry value="ubg">UBG</listEntry>
+            <listEntry value="ara">ARA</listEntry>
+            <listEntry value="arc">ARC</listEntry>
+            <listEntry value="nvi_pt">NVI_PT</listEntry>
+            <listEntry value="rst">RST</listEntry>
+            <listEntry value="kat">KAT</listEntry>
+            <listEntry value="sso89">SSO89</listEntry>
+            <listEntry value="b2000">B2000</listEntry>
+            <listEntry value="urd">URD</listEntry>
+            <listEntry value="xho96">XHO96</listEntry>
+            <listEntry value="zul59">ZUL59</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.slot1Enabled" title="@Strings.SettingSlot1Enabled">
+        <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.slot1Hour" title="@Strings.SettingSlot1Hour">
+        <settingConfig type="numeric" min="0" max="23" />
+    </setting>
+    <setting propertyKey="@Properties.slot1Minute" title="@Strings.SettingSlot1Minute">
+        <settingConfig type="numeric" min="0" max="59" />
+    </setting>
+
+    <setting propertyKey="@Properties.slot2Enabled" title="@Strings.SettingSlot2Enabled">
+        <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.slot2Hour" title="@Strings.SettingSlot2Hour">
+        <settingConfig type="numeric" min="0" max="23" />
+    </setting>
+    <setting propertyKey="@Properties.slot2Minute" title="@Strings.SettingSlot2Minute">
+        <settingConfig type="numeric" min="0" max="59" />
+    </setting>
+
+    <setting propertyKey="@Properties.slot3Enabled" title="@Strings.SettingSlot3Enabled">
+        <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.slot3Hour" title="@Strings.SettingSlot3Hour">
+        <settingConfig type="numeric" min="0" max="23" />
+    </setting>
+    <setting propertyKey="@Properties.slot3Minute" title="@Strings.SettingSlot3Minute">
+        <settingConfig type="numeric" min="0" max="59" />
+    </setting>
+</settings>
