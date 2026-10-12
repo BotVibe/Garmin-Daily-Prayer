@@ -24,7 +24,7 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
 echo "Downloading device definitions (${GRANBIKE_SHA:0:7})..."
-curl -fsSL -o "$TMP/devices.tar.gz" \
+curl -fsSL --retry 5 --retry-all-errors -o "$TMP/devices.tar.gz" \
     "https://github.com/mgallesio/granbike-face-builder/archive/${GRANBIKE_SHA}.tar.gz"
 tar -xzf "$TMP/devices.tar.gz" -C "$TMP"
 GB="$(echo "$TMP"/granbike-face-builder-*/backend/devices)"
@@ -53,14 +53,25 @@ PY
 if [ "${#missing[@]}" -gt 0 ]; then
     echo "Fetching ${missing[*]} from Garmin-Sdk (${AZZURE_SHA:0:7})..."
     python3 - "$DEST" "$AZZURE_SHA" "${missing[@]}" <<'PY'
-import json, os, sys, urllib.error, urllib.request
+import json, os, sys, time, urllib.error, urllib.request
+
+def urlopen(url, timeout=60):
+    # GitHub occasionally answers 5xx; retry with backoff before failing CI.
+    for attempt in range(5):
+        try:
+            return urllib.request.urlopen(url, timeout=timeout)
+        except (urllib.error.HTTPError, urllib.error.URLError) as exc:
+            code = getattr(exc, "code", None)
+            if attempt == 4 or (code is not None and code < 500 and code != 429):
+                raise
+            time.sleep(2 ** attempt * 3)
 
 dest, sha, *devices = sys.argv[1:]
 api = "https://api.github.com/repos/AzzureSkyy/Garmin-Sdk/contents"
 
 def listing(path):
     url = f"{api}/{path}?ref={sha}"
-    with urllib.request.urlopen(url, timeout=60) as response:
+    with urlopen(url, timeout=60) as response:
         return json.load(response)
 
 def download(path, target):
@@ -73,7 +84,7 @@ def download(path, target):
         if entry["type"] == "dir":
             download(entry["path"], out)
         elif entry["type"] == "file":
-            with urllib.request.urlopen(entry["download_url"], timeout=60) as response:
+            with urlopen(entry["download_url"], timeout=60) as response:
                 open(out, "wb").write(response.read())
 
 for device in devices:
