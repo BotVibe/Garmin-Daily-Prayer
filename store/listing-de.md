@@ -27,6 +27,8 @@ So benutzt du die App:
 
 Der Vers wird für den aktuellen Tag gespeichert. Ohne Verbindung zum Telefon zeigt die App den zuletzt geladenen Vers.
 
+Hinweis: Erinnerungen erfordern die Background-Berechtigung. Die App weckt die Uhr nur zu den eingestellten Zeiten (max. 3x/Tag).
+
 Quelle: https://dailyverses.net/
 
 ## Schlüsselwörter
