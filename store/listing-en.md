@@ -25,6 +25,8 @@ How to use it:
 
 The verse is stored for the current day. With no phone connection the app shows the last verse it loaded.
 
+Note: Reminders require the Background permission. The app wakes the watch only at the configured times (max. 3x/day).
+
 Source: https://dailyverses.net/
 
 ## Keywords
