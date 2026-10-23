@@ -22,8 +22,8 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 ## Harte Invarianten
 
 1. **App-Typ bleibt `watch-app`.** Kein Widget/Glance als Ersatz für den Wake-Flow (Widgets sind auf Zielgeräten oft abgekündigt; Wake braucht die App).
-2. **Nur ein TemporalEvent.** Immer die *nächste* Slot-Zeit schedulen (`ReminderScheduler.scheduleNext`). Niemals Intervall-Polling für Erinnerungen.
-3. **Ablehnen = Idle.** Kein automatisches erneutes Öffnen; nächste Erinnerung trotzdem planen (im Background vor/bei Wake).
+2. **Nur ein TemporalEvent.** Immer die *nächste* **aktivierte** Slot-Zeit schedulen (`ReminderScheduler.scheduleNext`). Niemals Intervall-Polling. Niemals eine Nicht-Slot-Zeit (z. B. `now+5min`) als Wake registrieren.
+3. **Ablehnen = Idle.** Kein automatisches erneutes Öffnen; nächste Erinnerung trotzdem planen (im Background vor/bei Wake). **`requestApplicationWake` nur wenn `isReminderDueNow`** (lokale Zeit nahe einem aktivierten Slot); sonst nur neu schedulen und exit.
 4. **Nur Zurück in VerseView beendet die App** (`System.exit`) → normales Watchface. Select/Tap beendet **nicht**; sie halten die Anzeige hell (`Attention.backlight`, wo unterstützt).
 5. **API:** Plaintext `https://dailyverses.net/get/verse?language=<code>`. Der Website-`verse.js`-Embed ist dokumentiert, aber nicht der Primärpfad.
 6. **`language` Query-Param = Übersetzungscode** (z. B. `lut`), nicht ISO-Sprachcode. Gespeichert wird die Katalog-Position `languageIndex`.
@@ -82,7 +82,7 @@ Connect-Mobile-Settings spiegeln die Properties, können die Übersetzungsliste 
 
 Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 
-Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` über `Gregorian.info` / Mitternacht lokal). Niemals lokale HH:MM in `Gregorian.moment` stecken (dessen Optionen sind UTC — Ursache für ~1 h Versatz). TemporalEvent: min. 5 Minuten ab `now` **und** `Background.getLastTemporalEventTime`.
+Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` über `Gregorian.info` / Mitternacht lokal). Niemals lokale HH:MM in `Gregorian.moment` stecken (dessen Optionen sind UTC — Ursache für ~1–2 h Versatz, z. B. 09:00→11:00 bei UTC+2). TemporalEvent: min. 5 Minuten ab `now` **und** `Background.getLastTemporalEventTime`. Deaktivierte Slots zählen nicht; Background holt keine Verse und zeigt keine Wake außerhalb des Due-Fensters (~15 Min).
 
 ---
 
@@ -130,9 +130,9 @@ Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` üb
 
 ### Bekannte CIQ-Fallen
 
-- TemporalEvent: min. 5 Minuten; nur einer aktiv; `getLastTemporalEventTime` + 5 Min beachten.
+- TemporalEvent: min. 5 Minuten; nur einer aktiv; `getLastTemporalEventTime` + 5 Min beachten. Kein Register von Nicht-Slot-Zeiten.
 - `Gregorian.moment(options)` interpretiert Felder als **UTC**, nicht lokal. Lokale Slot-Zeiten über Mitternacht aus `Gregorian.info` bauen.
-- `requestApplicationWake` + `Background.exit` im Background-Kontext; Schedule der nächsten Zeit **nicht** vom Accept abhängig machen.
+- `requestApplicationWake` nur nach `isReminderDueNow`; Schedule der nächsten Zeit **nicht** vom Accept abhängig machen.
 - `makeWebRequest` braucht Phone-Link.
 - Ungültige `<iq:product id>` im Manifest brechen den Build — nur dokumentierte Device-IDs. SDK 9.2.0 kennt `fenix7pronowifi` und `fenix7xpronowifi` nicht.
 - `String` hat kein `trim()`. Whitespace in `VerseApi.trim` selbst entfernen.

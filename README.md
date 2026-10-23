@@ -15,8 +15,8 @@ Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lä
 
 ## Features
 
-1. **Erinnerungen** – Bis zu drei **lokale** Uhrzeiten (einzeln aktivierbar). Zur eingestellten Wanduhrzeit der Uhr erscheint der Garmin-Systemdialog *Annehmen / Ablehnen* (`Background.requestApplicationWake`).
-2. **Ablehnen** – Es passiert nichts; die Uhr läuft normal weiter. Die nächste Erinnerung wird trotzdem geplant.
+1. **Erinnerungen** – Bis zu drei **lokale** Uhrzeiten (einzeln aktivierbar). Jeder aktive Slot feuert **einmal pro Kalendertag** zur HH:MM der Uhr (Zeitzone/DST der Uhr). Deaktivierte Slots feuern nie (ihre gespeicherten Zeiten zählen nicht).
+2. **Ablehnen** – Es passiert nichts; die Uhr läuft normal weiter. Die nächste Erinnerung wird trotzdem geplant. Keine Catch-up-/Doppel-Alerts außerhalb eines fälligen Slots.
 3. **Annehmen** – Die App öffnet die Vers-Ansicht mit dem Spruch des Tages.
 4. **Ausblenden** – Nur die **Zurück**-Taste beendet die App → Zifferblatt. Tippen/Select beendet nicht; sie halten die Anzeige länger hell (soweit die Plattform das erlaubt).
 5. **Manuell** – App im Apps-Menü starten → Vers wird sofort geladen (Cache bevorzugt).
@@ -119,8 +119,8 @@ Bei Erweiterung der Liste **müssen** `Translations.mc`, `resources/settings/set
 ```text
 source/
   DailyVerseApp.mc       App-Entry, Background-Hook, Settings-Change
-  BackgroundService.mc   TemporalEvent → Wake → exit
-  ReminderScheduler.mc   Nächstes Moment aus 3 Slots
+  BackgroundService.mc   TemporalEvent → due? Wake : idle → exit
+  ReminderScheduler.mc   Nächstes Moment aus aktiven Slots + Due-Check
   VerseView.mc           Vers-UI + Delegate (Exit / Menü)
   HomeView.mc            Optionaler Brand-Screen (nicht Default-Entry)
   SettingsMenu.mc        On-Device-Menüs + Zeit-Picker
@@ -134,11 +134,12 @@ source/
 
 ### Energie & Background
 
-- Nur **ein** `registerForTemporalEvent(Moment)` (Garmin-Limit).
+- Nur **ein** `registerForTemporalEvent(Moment)` (Garmin-Limit), immer die nächste *aktivierte* Slot-Zeit.
 - Slot-Zeiten sind **lokale Wanduhrzeit** (`ReminderScheduler.momentForLocalClock`); `Gregorian.moment` (UTC-Optionen) wird dafür nicht verwendet.
-- Nach jedem Fire wird sofort die **nächste** Zeit berechnet (auch bei Ablehnen).
-- Minimum **5 Minuten** Abstand zu `Time.now` **und** zum letzten TemporalEvent (`getLastTemporalEventTime`).
-- Fetch primär im **Foreground** nach App-Start; Background weckt nur.
+- `requestApplicationWake` nur wenn `isReminderDueNow` (lokale Zeit innerhalb ~15 Min eines aktiven Slots). Sonst nur neu schedulen — keine Alerts bei App-Start, Settings-Sync oder verirrten TemporalEvents.
+- Nach jedem Fire wird sofort die **nächste** Zeit berechnet (auch bei Ablehnen). Kein Fallback auf „jetzt + 5 Min“ als Wake-Zeit.
+- Minimum **5 Minuten** Abstand zu `Time.now` **und** zum letzten TemporalEvent (`getLastTemporalEventTime`). Erwartete Genauigkeit: typisch wenige Minuten um die Soll-Minute; bis ~5 Min verspätet, wenn die 5‑Min-Regel greift, plus OS-Wake-Latenz.
+- Fetch nur im **Foreground** nach App-Start; Background lädt keine Verse und erzeugt keine Alerts außerhalb fälliger Erinnerungen.
 - Cache-Schlüssel: Datum + Sprache + Übersetzungseinstellung.
 - Anzeige hell halten: `Attention.backlight` (Feature-Check); auf OLED ~1 Min Continuous-Limit (`BacklightOnTooLongException`). Kein dauerhaftes Erzwingen der Helligkeit über die Systemeinstellung hinaus.
 
@@ -221,7 +222,7 @@ Ohne Garmin SDK prüft die GitHub Actions Pipeline (`.github/workflows/ci.yml`) 
 | --- | --- |
 | `tests/test_verse_parse.py` | Parser für Plaintext/HTML/JS-Antworten |
 | `tests/test_random_translation.py` | stabile Zufalls-Übersetzung pro Tag |
-| `tests/test_reminder_schedule.py` | nächste Erinnerungszeit (3 Slots, lokale Zeit, Zürich Sommer/Winter, +5‑Min-Regel) |
+| `tests/test_reminder_schedule.py` | nächste Erinnerungszeit, Due-Guard, Zürich UTC+2 09:00≠11:00, 14:07/22:36 über Tage, Settings-Wechsel |
 | `tests/test_translation_filter.py` | Sprach→Übersetzungs-Filter / Default-Fallback |
 | `tests/test_catalog_consistency.py` | `Translations.mc` ↔ Settings ↔ Strings |
 | `tests/test_manifest.py` | Manifest, Permissions, Background-Invarianten |

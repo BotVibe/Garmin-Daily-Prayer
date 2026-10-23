@@ -3,7 +3,11 @@ import Toybox.Background;
 import Toybox.Lang;
 import Toybox.System;
 
-//! Background entry: fire wake dialog at reminder times, then exit quickly.
+//! Background entry: at a due reminder TemporalEvent, ask to open the app; else idle.
+//!
+//! Does not fetch verses or touch the network. A TemporalEvent that is not near an
+//! enabled slot (stray schedule, leftover after settings change, platform quirk)
+//! only advances the schedule — never shows a wake dialog.
 (:background)
 class BackgroundService extends System.ServiceDelegate {
 
@@ -12,8 +16,14 @@ class BackgroundService extends System.ServiceDelegate {
     }
 
     function onTemporalEvent() as Void {
-        // Always advance the schedule first so decline still gets the next slot.
+        // Always advance the schedule first so decline / non-due still get the next slot.
         ReminderScheduler.scheduleNext();
+
+        if (!ReminderScheduler.isReminderDueNow()) {
+            // Not at an enabled reminder HH:MM — no user-visible alert.
+            Background.exit(null);
+            return;
+        }
 
         try {
             // Resources are unavailable in the background process, so the app name
