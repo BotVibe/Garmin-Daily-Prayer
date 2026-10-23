@@ -26,6 +26,7 @@
     <string id="Slot3">Reminder 3</string>
     <string id="SlotEnabled">On</string>
     <string id="SlotDisabled">Off</string>
+    <string id="SlotTime">Time</string>
     <string id="SlotHour">Hour</string>
     <string id="SlotMinute">Minute</string>
     <string id="On">On</string>

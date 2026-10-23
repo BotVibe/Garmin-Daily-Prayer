@@ -21,7 +21,7 @@ How to use it:
 3. Choose a language and a Bible translation. "Random (language)" picks one translation of that language for the day and keeps it until midnight.
 4. Turn on up to three reminder times.
 5. At a reminder, choose Accept to see the verse. Decline leaves the watch as it is, and the next reminder stays scheduled.
-6. Back or Select closes the app and returns to the watch face.
+6. Back closes the app and returns to the watch face. Tapping the screen keeps it lit and does not exit.
 
 The verse is stored for the current day. With no phone connection the app shows the last verse it loaded.
 

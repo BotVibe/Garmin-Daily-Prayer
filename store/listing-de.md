@@ -23,7 +23,7 @@ So benutzt du die App:
 3. Wähle Sprache und Bibelübersetzung. „Zufällig (Sprache)“ nimmt für den Tag eine Übersetzung der gewählten Sprache und behält sie bis Mitternacht.
 4. Schalte unter Erinnerungen bis zu drei Uhrzeiten ein.
 5. Zur eingestellten Zeit auf Annehmen tippen zeigt den Vers. Ablehnen lässt die Uhr, wie sie ist; die nächste Erinnerung bleibt geplant.
-6. Zurück oder Select beendet die App und kehrt zum Zifferblatt zurück.
+6. Zurück beendet die App und kehrt zum Zifferblatt zurück. Tippen hält die Anzeige hell und beendet die App nicht.
 
 Der Vers wird für den aktuellen Tag gespeichert. Ohne Verbindung zum Telefon zeigt die App den zuletzt geladenen Vers.
 

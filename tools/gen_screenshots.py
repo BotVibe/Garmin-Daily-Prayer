@@ -107,6 +107,79 @@ def render_verse_en() -> Image.Image:
     return finish(image)
 
 
+def render_verse_long_reference(*, size: int = SIZE) -> Image.Image:
+    """Verse screen with a long reference that wraps (round layout preview)."""
+    global SIZE
+    old = SIZE
+    SIZE = size
+    try:
+        image = verse_background()
+        draw = ImageDraw.Draw(image)
+        text = (
+            "Und der HERR wird König sein über die ganze Erde; "
+            "an jenem Tag wird der HERR einzig sein und sein Name einzig."
+        )
+        face = font(20 if size <= 360 else 22)
+        lines = wrap(draw, text, face, int(SIZE * 0.76))
+        block = len(lines) * 28
+        draw_centered(draw, lines, face, max(int(SIZE * 0.22), (SIZE - block) // 2 - 40), WHITE, 6)
+        ref_face = font(18 if size <= 360 else 20)
+        ref_lines = wrap(
+            draw,
+            "Das erste Buch der Chronik 29:11-13",
+            ref_face,
+            int(SIZE * 0.76),
+        )
+        draw_centered(draw, ref_lines, ref_face, int(SIZE * 0.72), GOLD, 4)
+        draw_centered(draw, ["LUT"], font(14), int(SIZE * 0.88), GRAY, 0)
+        return finish(image)
+    finally:
+        SIZE = old
+
+
+def render_time_picker(hour: int = 9, minute: int = 0) -> Image.Image:
+    """Approximate WatchUi.Picker with two NumberFactory columns (hour : minute)."""
+    image = Image.new("RGB", (SIZE, SIZE), MENU_BG)
+    draw = ImageDraw.Draw(image)
+    draw_centered(draw, ["Uhrzeit"], font(22, bold=True), 42, WHITE, 0)
+
+    # Selection band
+    band_top = SIZE // 2 - 28
+    band_bot = SIZE // 2 + 28
+    draw.rounded_rectangle((48, band_top, SIZE - 48, band_bot), 16, fill=MENU_BAR)
+
+    col_h = SIZE // 2 - 40
+    col_m = SIZE // 2 + 40
+    face_dim = font(26)
+    face_sel = font(36, bold=True)
+
+    def col(cx: int, center_val: int, modulo: int) -> None:
+        for delta, face, fill in (
+            (-2, face_dim, SUB),
+            (-1, face_dim, SUB),
+            (0, face_sel, WHITE),
+            (1, face_dim, SUB),
+            (2, face_dim, SUB),
+        ):
+            v = (center_val + delta) % modulo
+            label = f"{v:02d}"
+            box = draw.textbbox((0, 0), label, font=face)
+            y = SIZE // 2 + delta * 36 - (box[3] - box[1]) // 2
+            draw.text((cx - (box[2] - box[0]) / 2, y), label, font=face, fill=fill)
+
+    col(col_h, hour, 24)
+    colon = ":"
+    box = draw.textbbox((0, 0), colon, font=face_sel)
+    draw.text(
+        ((SIZE - (box[2] - box[0])) / 2, SIZE // 2 - (box[3] - box[1]) // 2),
+        colon,
+        font=face_sel,
+        fill=WHITE,
+    )
+    col(col_m, minute, 60)
+    return finish(image)
+
+
 def render_menu(
     title: str,
     rows: list[tuple[str, str | None]],
@@ -139,6 +212,9 @@ def render_menu(
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    pr_out = ROOT / "store" / "assets" / "pr-screenshots"
+    pr_out.mkdir(parents=True, exist_ok=True)
+
     shots = {
         "02-settings-de.png": render_menu(
             "Einstellungen",
@@ -169,6 +245,16 @@ def main() -> None:
     }
     for name, image in shots.items():
         path = OUT / name
+        image.save(path)
+        print(f"  {path.relative_to(ROOT)} {image.size}")
+
+    pr_shots = {
+        "time-picker-390.png": render_time_picker(9, 0),
+        "long-reference-360.png": render_verse_long_reference(size=360),
+        "long-reference-454.png": render_verse_long_reference(size=454),
+    }
+    for name, image in pr_shots.items():
+        path = pr_out / name
         image.save(path)
         print(f"  {path.relative_to(ROOT)} {image.size}")
 

@@ -69,6 +69,33 @@ def test_no_watchui_import_in_background_modules() -> None:
         assert "Toybox.WatchUi" not in text, f"{filename} must not import WatchUi"
 
 
-def test_verse_view_exits_on_back() -> None:
+def test_verse_view_exits_on_back_not_select() -> None:
     text = (ROOT / "source" / "VerseView.mc").read_text(encoding="utf-8")
-    assert re.search(r"function onBack\(\)[\s\S]*?System\.exit\(\)", text)
+    assert re.search(r"function onBack\(\)[\s\S]*?dismiss\(\)", text)
+    assert "System.exit()" in text
+    # Select / tap must keep the screen lit, not leave the app.
+    select = re.search(
+        r"function onSelect\(\) as Boolean \{([\s\S]*?)\n    \}",
+        text,
+    )
+    assert select is not None
+    assert "dismiss()" not in select.group(1)
+    assert "System.exit()" not in select.group(1)
+    assert "keepLit()" in select.group(1) or "pokeBacklight()" in select.group(1)
+    assert "Attention has :backlight" in text
+
+
+def test_reminder_scheduler_uses_local_clock_not_utc_moment() -> None:
+    text = (ROOT / "source" / "ReminderScheduler.mc").read_text(encoding="utf-8")
+    assert "momentForLocalClock" in text
+    assert "getLastTemporalEventTime" in text
+    # Must not call Gregorian.moment(...) with local HH:MM (UTC options).
+    assert not re.search(r"Gregorian\.moment\s*\(", text)
+
+
+def test_settings_menu_filters_translations_and_uses_time_picker() -> None:
+    text = (ROOT / "source" / "SettingsMenu.mc").read_text(encoding="utf-8")
+    assert "Translations.codesForLanguage(lang)" in text
+    assert "SlotTimePicker" in text
+    assert "NumberFactory" in text
+    assert "class NumberPickMenu" not in text

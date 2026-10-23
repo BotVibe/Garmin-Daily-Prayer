@@ -15,12 +15,12 @@ Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lä
 
 ## Features
 
-1. **Erinnerungen** – Bis zu drei Uhrzeiten (einzeln aktivierbar). Zur Zeit erscheint der Garmin-Systemdialog *Annehmen / Ablehnen* (`Background.requestApplicationWake`).
+1. **Erinnerungen** – Bis zu drei **lokale** Uhrzeiten (einzeln aktivierbar). Zur eingestellten Wanduhrzeit der Uhr erscheint der Garmin-Systemdialog *Annehmen / Ablehnen* (`Background.requestApplicationWake`).
 2. **Ablehnen** – Es passiert nichts; die Uhr läuft normal weiter. Die nächste Erinnerung wird trotzdem geplant.
 3. **Annehmen** – Die App öffnet die Vers-Ansicht mit dem Spruch des Tages.
-4. **Ausblenden** – Zurück-Taste oder Select beendet die App → zurück zum Zifferblatt.
+4. **Ausblenden** – Nur die **Zurück**-Taste beendet die App → Zifferblatt. Tippen/Select beendet nicht; sie halten die Anzeige länger hell (soweit die Plattform das erlaubt).
 5. **Manuell** – App im Apps-Menü starten → Vers wird sofort geladen (Cache bevorzugt).
-6. **Einstellungen** – Sprache, Bibelübersetzung (inkl. **Zufällig** für die gewählte Sprache), Erinnerungszeiten – on-device und in Garmin Connect Mobile.
+6. **Einstellungen** – Sprache, Bibelübersetzung nur der gewählten Sprache (inkl. **Zufällig**), Erinnerungszeiten per Stunden-/Minuten-Rad – on-device und (eingeschränkt) in Garmin Connect Mobile.
 7. **Energieeffizienz** – Ein TemporalEvent nur für die *nächste* Zeit, Tages-Cache, dunkles OLED-freundliches UI, kein Polling.
 
 ---
@@ -28,7 +28,7 @@ Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lä
 ## Nutzerfluss
 
 ```text
-Background TemporalEvent
+Background TemporalEvent  (lokale Wanduhrzeit der Uhr)
         │
         ▼
 requestApplicationWake  ──Ablehnen──►  Uhr normal / nächste Zeit geplant
@@ -37,9 +37,8 @@ requestApplicationWake  ──Ablehnen──►  Uhr normal / nächste Zeit gepl
         ▼
    VerseView (Spruch)
         │
-   Zurück / Select
-        ▼
-   App beendet → Watchface
+   Tippen/Select → Display hell halten (kein Exit)
+   Zurück → App beendet → Watchface
 
 Apps-Menü → App starten → VerseView (manuell)
 Menü-Taste → Einstellungen / Aktualisieren
@@ -54,14 +53,16 @@ Menü-Taste → Einstellungen / Aktualisieren
 | Eintrag | Beschreibung |
 | --- | --- |
 | Sprache | Alle von DailyVerses.net unterstützten Sprachen |
-| Bibelübersetzung | Übersetzungen der gewählten Sprache **plus** „Zufällig (Sprache)“ |
-| Erinnerungen | Slot 1–3: aktiv, Stunde, Minute |
+| Bibelübersetzung | **Nur** Übersetzungen der gewählten Sprache **plus** „Zufällig (Sprache)“ |
+| Erinnerungen | Slot 1–3: aktiv, Uhrzeit (Zwei-Spalten-Rad Stunde∶Minute) |
 | Aktualisieren | Vers neu von der API laden |
 | Spruch des Tages | Zurück zur Vers-Ansicht |
 
+Sprachwechsel: passt die gewählte Übersetzung nicht mehr zur Sprache, fällt die App auf den Default dieser Sprache zurück (`Translations.defaultCode`).
+
 ### Garmin Connect Mobile
 
-Dieselben Properties (`languageIndex`, `translationIndex`, Slot-Flags/Zeiten) sind unter den App-Einstellungen spiegelbar. Garmin Connect akzeptiert in Auswahllisten nur Zahlen, deshalb speichert die App Katalog-Positionen statt der Codes: `0` ist „Zufällig“, danach folgen die Übersetzungen in der Reihenfolge von `Translations.languageIds()`. Eine Kombination, die nicht zur gewählten Sprache passt, setzt die App auf die Standard-Übersetzung dieser Sprache zurück. Die Versionszeile ist dort nur lesbar.
+Dieselben Properties (`languageIndex`, `translationIndex`, Slot-Flags/Zeiten) sind unter den App-Einstellungen spiegelbar. Garmin Connect akzeptiert in Auswahllisten nur Zahlen und **kann Listen nicht dynamisch nach einer anderen Einstellung filtern**. Deshalb zeigt Connect weiterhin den flachen Katalog: `0` ist „Zufällig“, danach alle Übersetzungen in der Reihenfolge von `Translations.languageIds()`. Eine Kombination, die nicht zur gewählten Sprache passt, wird beim App-Start und bei `onSettingsChanged` auf die Standard-Übersetzung dieser Sprache zurückgesetzt (`AppConfig.normalize`). Das ist die bestmögliche Lösung auf der Connect-Seite; die gefilterte Auswahl gibt es on-device. Die Versionszeile ist dort nur lesbar.
 
 ### Defaults
 
@@ -122,7 +123,8 @@ source/
   ReminderScheduler.mc   Nächstes Moment aus 3 Slots
   VerseView.mc           Vers-UI + Delegate (Exit / Menü)
   HomeView.mc            Optionaler Brand-Screen (nicht Default-Entry)
-  SettingsMenu.mc        On-Device-Menüs
+  SettingsMenu.mc        On-Device-Menüs + Zeit-Picker
+  NumberFactory.mc       Picker-Spalten (Stunde/Minute)
   VerseApi.mc            makeWebRequest + Parser
   VerseCache.mc          Application.Storage Tages-Cache
   AppConfig.mc           Properties-Zugriff
@@ -133,10 +135,12 @@ source/
 ### Energie & Background
 
 - Nur **ein** `registerForTemporalEvent(Moment)` (Garmin-Limit).
+- Slot-Zeiten sind **lokale Wanduhrzeit** (`ReminderScheduler.momentForLocalClock`); `Gregorian.moment` (UTC-Optionen) wird dafür nicht verwendet.
 - Nach jedem Fire wird sofort die **nächste** Zeit berechnet (auch bei Ablehnen).
-- Minimum **5 Minuten** Abstand beachten.
+- Minimum **5 Minuten** Abstand zu `Time.now` **und** zum letzten TemporalEvent (`getLastTemporalEventTime`).
 - Fetch primär im **Foreground** nach App-Start; Background weckt nur.
 - Cache-Schlüssel: Datum + Sprache + Übersetzungseinstellung.
+- Anzeige hell halten: `Attention.backlight` (Feature-Check); auf OLED ~1 Min Continuous-Limit (`BacklightOnTooLongException`). Kein dauerhaftes Erzwingen der Helligkeit über die Systemeinstellung hinaus.
 
 ### Berechtigungen
 
@@ -217,7 +221,8 @@ Ohne Garmin SDK prüft die GitHub Actions Pipeline (`.github/workflows/ci.yml`) 
 | --- | --- |
 | `tests/test_verse_parse.py` | Parser für Plaintext/HTML/JS-Antworten |
 | `tests/test_random_translation.py` | stabile Zufalls-Übersetzung pro Tag |
-| `tests/test_reminder_schedule.py` | nächste Erinnerungszeit (3 Slots, +5‑Min-Regel) |
+| `tests/test_reminder_schedule.py` | nächste Erinnerungszeit (3 Slots, lokale Zeit, Zürich Sommer/Winter, +5‑Min-Regel) |
+| `tests/test_translation_filter.py` | Sprach→Übersetzungs-Filter / Default-Fallback |
 | `tests/test_catalog_consistency.py` | `Translations.mc` ↔ Settings ↔ Strings |
 | `tests/test_manifest.py` | Manifest, Permissions, Background-Invarianten |
 | `tests/test_project_structure.py` | Pflicht-Dateien & Doku-Hinweise |
@@ -258,7 +263,8 @@ Workflow [`.github/workflows/auto-merge.yml`](.github/workflows/auto-merge.yml):
 | --- | --- |
 | Vers lädt nicht | Telefon verbinden, Garmin Connect geöffnet, Internet aktiv; Menü → Aktualisieren |
 | Keine Erinnerung | Mindestens einen Slot aktivieren; App einmal öffnen (registriert TemporalEvent); Background-Berechtigung |
-| Falsche Übersetzung | Sprache prüfen; Übersetzung muss zur Sprache gehören oder „Zufällig“ |
+| Erinnerung zur falschen Stunde | Zeiten sind lokale Uhrzeit der Uhr; nach Zeitzonen-/DST-Wechsel App einmal öffnen. Plattform kann um wenige Minuten verzögern (5‑Min-Regel / Wake-Latenz) |
+| Falsche Übersetzung | On-device nur Codes der Sprache; in Connect ggf. Default nach Sprachwechsel prüfen |
 | Alter Vers | Datum gewechselt? Cache gilt pro Tag; „Aktualisieren“ erzwingen |
 | Ablehnen öffnet nichts | Erwartetes Verhalten |
 

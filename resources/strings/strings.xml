@@ -26,6 +26,7 @@
     <string id="Slot3">Erinnerung 3</string>
     <string id="SlotEnabled">Aktiv</string>
     <string id="SlotDisabled">Aus</string>
+    <string id="SlotTime">Uhrzeit</string>
     <string id="SlotHour">Stunde</string>
     <string id="SlotMinute">Minute</string>
     <string id="On">An</string>
