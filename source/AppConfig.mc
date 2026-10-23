@@ -30,11 +30,22 @@ module AppConfig {
     }
 
     function getTranslationCode() as String {
+        var langId = getLanguageId();
         var v = Application.Properties.getValue(KEY_TRANSLATION);
+        var code = DEFAULT_TRANSLATION_CODE;
         if (v instanceof Number) {
-            return Translations.settingCodeForIndex(v as Number);
+            code = Translations.settingCodeForIndex(v as Number);
         }
-        return DEFAULT_TRANSLATION_CODE;
+        // On-device menus only offer codes for the selected language. Connect
+        // Mobile lists every catalog code, so a stale pair can still be stored;
+        // treat that as the language default until normalize() persists a fix.
+        if (code.equals(Translations.RANDOM_CODE)) {
+            return code;
+        }
+        if (!Translations.isCodeInLanguage(langId, code)) {
+            return Translations.defaultCode(langId);
+        }
+        return code;
     }
 
     function setTranslationCode(code as String) as Void {
@@ -42,11 +53,19 @@ module AppConfig {
     }
 
     //! Garmin Connect lets language and translation be picked independently, so a
-    //! mismatched pair can arrive from the phone. Pull it back to a valid pair.
+    //! mismatched pair can arrive from the phone. Pull it back to a valid pair
+    //! and persist the fallback (language default, never a foreign code).
     function normalize() as Void {
         var langId = getLanguageId();
-        var code = getTranslationCode();
-        if (!code.equals(Translations.RANDOM_CODE) && !Translations.isCodeInLanguage(langId, code)) {
+        var v = Application.Properties.getValue(KEY_TRANSLATION);
+        var stored = DEFAULT_TRANSLATION_CODE;
+        if (v instanceof Number) {
+            stored = Translations.settingCodeForIndex(v as Number);
+        }
+        if (stored.equals(Translations.RANDOM_CODE)) {
+            return;
+        }
+        if (!Translations.isCodeInLanguage(langId, stored)) {
             setTranslationCode(Translations.defaultCode(langId));
         }
     }

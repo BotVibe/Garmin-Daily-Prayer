@@ -3,7 +3,7 @@
     <label id="statusLabel" x="center" y="12%" font="Graphics.FONT_XTINY"
            justification="Graphics.TEXT_JUSTIFY_CENTER" color="Graphics.COLOR_LT_GRAY" text="" />
     <!-- Font ladder: TextArea picks the largest size the whole verse fits into. -->
-    <text-area id="verseText" x="9%" y="19%" width="82%" height="56%"
+    <text-area id="verseText" x="9%" y="19%" width="82%" height="52%"
                justification="Graphics.TEXT_JUSTIFY_CENTER"
                color="Graphics.COLOR_WHITE" text="">
         <fonts>
@@ -13,8 +13,9 @@
             <font>Graphics.FONT_XTINY</font>
         </fonts>
     </text-area>
-    <label id="refLabel" x="center" y="78%" font="Graphics.FONT_TINY"
-           justification="Graphics.TEXT_JUSTIFY_CENTER" color="0xC8A060" text="" />
-    <label id="versionLabel" x="center" y="87%" font="Graphics.FONT_XTINY"
+    <text-area id="refLabel" x="10%" y="74%" width="80%" height="11%"
+               font="Graphics.FONT_TINY"
+               justification="Graphics.TEXT_JUSTIFY_CENTER" color="0xC8A060" text="" />
+    <label id="versionLabel" x="center" y="88%" font="Graphics.FONT_XTINY"
            justification="Graphics.TEXT_JUSTIFY_CENTER" color="Graphics.COLOR_LT_GRAY" text="" />
 </layout>

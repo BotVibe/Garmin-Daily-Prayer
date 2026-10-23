@@ -1,3 +1,4 @@
+import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
 import Toybox.WatchUi;
@@ -127,7 +128,10 @@ class LanguageMenuDelegate extends WatchUi.Menu2InputDelegate {
     function onSelect(item as WatchUi.MenuItem) as Void {
         var id = item.getId();
         if (id instanceof String) {
+            // setLanguageId falls back to the language default when the current
+            // translation code is not in codesForLanguage(newLang).
             AppConfig.setLanguageId(id as String);
+            VerseCache.clear();
             ReminderScheduler.scheduleNext();
         }
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
@@ -226,15 +230,9 @@ class SlotMenu extends WatchUi.Menu2 {
             null
         ));
         addItem(new WatchUi.MenuItem(
-            WatchUi.loadResource(Rez.Strings.SlotHour) as String,
-            AppConfig.getSlotHour(slot).format("%02d"),
-            :hour,
-            null
-        ));
-        addItem(new WatchUi.MenuItem(
-            WatchUi.loadResource(Rez.Strings.SlotMinute) as String,
-            AppConfig.getSlotMinute(slot).format("%02d"),
-            :minute,
+            WatchUi.loadResource(Rez.Strings.SlotTime) as String,
+            AppConfig.formatSlotTime(slot),
+            :time,
             null
         ));
     }
@@ -256,61 +254,80 @@ class SlotMenuDelegate extends WatchUi.Menu2InputDelegate {
                 AppConfig.setSlotEnabled(_slot, t.isEnabled());
                 ReminderScheduler.scheduleNext();
             }
-        } else if (id == :hour) {
-            WatchUi.pushView(new NumberPickMenu(0, 23, AppConfig.getSlotHour(_slot), method(:onHourPicked)), new NumberPickDelegate(), WatchUi.SLIDE_LEFT);
-        } else if (id == :minute) {
-            WatchUi.pushView(new NumberPickMenu(0, 59, AppConfig.getSlotMinute(_slot), method(:onMinutePicked)), new NumberPickDelegate(), WatchUi.SLIDE_LEFT);
+        } else if (id == :time) {
+            var title = WatchUi.loadResource(Rez.Strings.SlotTime) as String;
+            var picker = new SlotTimePicker(
+                AppConfig.getSlotHour(_slot),
+                AppConfig.getSlotMinute(_slot),
+                title
+            );
+            WatchUi.pushView(picker, new SlotTimePickerDelegate(_slot), WatchUi.SLIDE_LEFT);
         }
     }
 
-    function onHourPicked(value as Number) as Void {
-        AppConfig.setSlotHour(_slot, value);
-        ReminderScheduler.scheduleNext();
-        rebuildSlotMenu();
-    }
-
-    function onMinutePicked(value as Number) as Void {
-        AppConfig.setSlotMinute(_slot, value);
-        ReminderScheduler.scheduleNext();
-        rebuildSlotMenu();
-    }
-
-    private function rebuildSlotMenu() as Void {
+    function rebuildSlotMenu() as Void {
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         WatchUi.pushView(new SlotMenu(_slot), new SlotMenuDelegate(_slot), WatchUi.SLIDE_IMMEDIATE);
     }
 }
 
-typedef NumberPickCallback as Method(value as Number) as Void;
-
-module NumberPickState {
-    var callback as NumberPickCallback?;
-}
-
-class NumberPickMenu extends WatchUi.Menu2 {
-    function initialize(minVal as Number, maxVal as Number, current as Number, callback as NumberPickCallback) {
-        Menu2.initialize({:title => ""});
-        NumberPickState.callback = callback;
-        for (var v = minVal; v <= maxVal; v += 1) {
-            var label = v.format("%02d");
-            var sub = v == current ? "✓" : null;
-            addItem(new WatchUi.MenuItem(label, sub, v, null));
-        }
+//! Two-column hour:minute wheel (WatchUi.Picker + NumberFactory).
+class SlotTimePicker extends WatchUi.Picker {
+    function initialize(hour as Number, minute as Number, titleText as String) {
+        var title = new WatchUi.Text({
+            :text => titleText,
+            :locX => WatchUi.LAYOUT_HALIGN_CENTER,
+            :locY => WatchUi.LAYOUT_VALIGN_BOTTOM,
+            :color => Graphics.COLOR_WHITE
+        });
+        var hours = new NumberFactory(0, 23, 1, {:format => "%02d"});
+        var minutes = new NumberFactory(0, 59, 1, {:format => "%02d"});
+        var colon = new WatchUi.Text({
+            :text => ":",
+            :font => Graphics.FONT_LARGE,
+            :locX => WatchUi.LAYOUT_HALIGN_CENTER,
+            :locY => WatchUi.LAYOUT_VALIGN_CENTER,
+            :color => Graphics.COLOR_WHITE
+        });
+        Picker.initialize({
+            :title => title,
+            :pattern => [hours, colon, minutes],
+            :defaults => [
+                hours.getIndex(hour),
+                0,
+                minutes.getIndex(minute)
+            ]
+        });
     }
 }
 
-class NumberPickDelegate extends WatchUi.Menu2InputDelegate {
-    function initialize() {
-        Menu2InputDelegate.initialize();
+class SlotTimePickerDelegate extends WatchUi.PickerDelegate {
+    private var _slot as Number;
+
+    function initialize(slot as Number) {
+        PickerDelegate.initialize();
+        _slot = slot;
     }
 
-    function onSelect(item as WatchUi.MenuItem) as Void {
-        var id = item.getId();
-        var cb = NumberPickState.callback;
+    function onCancel() as Boolean {
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
-        if (id instanceof Number && cb != null) {
-            cb.invoke(id as Number);
+        return true;
+    }
+
+    function onAccept(values as Array) as Boolean {
+        // pattern = [hourFactory, colon Drawable, minuteFactory]
+        var hourObj = values[0];
+        var minuteObj = values[2];
+        if (hourObj instanceof Number && minuteObj instanceof Number) {
+            AppConfig.setSlotHour(_slot, hourObj as Number);
+            AppConfig.setSlotMinute(_slot, minuteObj as Number);
+            ReminderScheduler.scheduleNext();
         }
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        // Refresh the slot menu subtitle with the new time
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        WatchUi.pushView(new SlotMenu(_slot), new SlotMenuDelegate(_slot), WatchUi.SLIDE_IMMEDIATE);
+        return true;
     }
 }
 

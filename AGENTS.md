@@ -24,7 +24,7 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 1. **App-Typ bleibt `watch-app`.** Kein Widget/Glance als Ersatz für den Wake-Flow (Widgets sind auf Zielgeräten oft abgekündigt; Wake braucht die App).
 2. **Nur ein TemporalEvent.** Immer die *nächste* Slot-Zeit schedulen (`ReminderScheduler.scheduleNext`). Niemals Intervall-Polling für Erinnerungen.
 3. **Ablehnen = Idle.** Kein automatisches erneutes Öffnen; nächste Erinnerung trotzdem planen (im Background vor/bei Wake).
-4. **Zurück/Select in VerseView beendet die App** (`System.exit`) → normales Watchface.
+4. **Nur Zurück in VerseView beendet die App** (`System.exit`) → normales Watchface. Select/Tap beendet **nicht**; sie halten die Anzeige hell (`Attention.backlight`, wo unterstützt).
 5. **API:** Plaintext `https://dailyverses.net/get/verse?language=<code>`. Der Website-`verse.js`-Embed ist dokumentiert, aber nicht der Primärpfad.
 6. **`language` Query-Param = Übersetzungscode** (z. B. `lut`), nicht ISO-Sprachcode. Gespeichert wird die Katalog-Position `languageIndex`.
 7. **Übersetzung „Zufällig“** (`translationIndex` 0, intern `random`): stabile Tageswahl aus Codes der Sprache; Ergebnis cachen.
@@ -44,7 +44,7 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 | Properties | `source/AppConfig.mc`, `resources/properties/properties.xml`, `resources/settings/settings.xml` |
 | UI Vers | `source/VerseView.mc`, `resources/layouts/verse.xml`, `resources-round-*/` |
 | UI Home (optional) | `source/HomeView.mc` (Default-Entry ist VerseView) |
-| UI Settings | `source/SettingsMenu.mc` |
+| UI Settings | `source/SettingsMenu.mc`, `source/NumberFactory.mc` (Zeit-Picker) |
 | Strings | `resources/strings/strings.xml`, `resources-eng/strings/strings.xml` |
 | CI / Tests | `.github/workflows/ci.yml`, `tests/`, `tools/dailyverse_lib/`, `requirements-dev.txt` |
 | Build-Skripte | `scripts/build.sh`, `scripts/test.sh`, `scripts/export.sh`, `scripts/fetch_devices.sh` |
@@ -76,9 +76,13 @@ Keine `WatchUi`-Abhängigkeiten im Background-Pfad.
 | `slotNHour` | number | 0–23 |
 | `slotNMinute` | number | 0–59 |
 
-On-Device-Menüs sind die UX-Quelle der Wahrheit für kaskadierende Sprache→Übersetzung. Connect-Mobile-Settings spiegeln die Properties.
+On-Device-Menüs sind die UX-Quelle der Wahrheit für kaskadierende Sprache→Übersetzung: die Übersetzungs-Liste zeigt nur `Translations.codesForLanguage(lang)` (+ „Zufällig“). Wird die Sprache gewechselt und die aktuelle Übersetzung ungültig, Fallback auf `defaultCode(lang)`.
+
+Connect-Mobile-Settings spiegeln die Properties, können die Übersetzungsliste aber **nicht** dynamisch nach Sprache filtern (Garmin `list`-Settings sind flach/numerisch). `AppConfig.normalize()` / `getTranslationCode()` validieren und fallen auf den Sprach-Default zurück. Das ist die bestmögliche Plattformlösung.
 
 Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
+
+Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` über `Gregorian.info` / Mitternacht lokal). Niemals lokale HH:MM in `Gregorian.moment` stecken (dessen Optionen sind UTC — Ursache für ~1 h Versatz). TemporalEvent: min. 5 Minuten ab `now` **und** `Background.getLastTemporalEventTime`.
 
 ---
 
@@ -126,14 +130,16 @@ Nach Settings-Änderungen immer `ReminderScheduler.scheduleNext()` aufrufen.
 
 ### Bekannte CIQ-Fallen
 
-- TemporalEvent: min. 5 Minuten; nur einer aktiv.
+- TemporalEvent: min. 5 Minuten; nur einer aktiv; `getLastTemporalEventTime` + 5 Min beachten.
+- `Gregorian.moment(options)` interpretiert Felder als **UTC**, nicht lokal. Lokale Slot-Zeiten über Mitternacht aus `Gregorian.info` bauen.
 - `requestApplicationWake` + `Background.exit` im Background-Kontext; Schedule der nächsten Zeit **nicht** vom Accept abhängig machen.
 - `makeWebRequest` braucht Phone-Link.
 - Ungültige `<iq:product id>` im Manifest brechen den Build — nur dokumentierte Device-IDs. SDK 9.2.0 kennt `fenix7pronowifi` und `fenix7xpronowifi` nicht.
 - `String` hat kein `trim()`. Whitespace in `VerseApi.trim` selbst entfernen.
 - Sprach-Ressourcen nicht per `eng.resourcePath` anhängen. Der Default-Jungle mappt `resources-<lang>` auf `base.lang.<lang>`.
-- Connect-Settings vom Typ `list` akzeptieren nur numerische `listEntry`-Werte. `settings.xml` kommt aus `tools/gen_settings.py`.
+- Connect-Settings vom Typ `list` akzeptieren nur numerische `listEntry`-Werte und können nicht von einer anderen Setting abhängen. `settings.xml` kommt aus `tools/gen_settings.py`.
 - Layouts erzeugen Custom-Drawables mit einem Parameter-Dictionary. `initialize(params)` muss es an `Drawable.initialize` weiterreichen.
+- `Attention.backlight`: Feature-Check (`Attention has :backlight`); auf OLED kann längeres Halten `BacklightOnTooLongException` werfen (~1 Min). System-Timeout der Hintergrundbeleuchtung bleibt maßgeblich; die App kann nur erneut anstoßen, nicht dauerhaft erzwingen.
 
 ---
 

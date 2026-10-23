@@ -1,10 +1,13 @@
 import Toybox.Application;
+import Toybox.Attention;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
+import Toybox.Timer;
 import Toybox.WatchUi;
 
 //! Primary screen: loading / verse / error. Back dismisses to watch face.
+//! Tap / Select keep the screen lit (backlight poke) and do not exit.
 class VerseView extends WatchUi.View {
 
     private var _forceRefresh as Boolean;
@@ -16,6 +19,13 @@ class VerseView extends WatchUi.View {
     private var _error as Boolean = false;
     private var _request as VerseApi.Request?;
     private var _fromCache as Boolean = false;
+    private var _backlightTimer as Timer.Timer?;
+    private var _backlightTicks as Number = 0;
+
+    //! Re-poke interval while reading. OLED burn-in protection typically
+    //! rejects holding the backlight past ~1 minute of continuous requests.
+    private const BACKLIGHT_INTERVAL_MS as Number = 10000;
+    private const BACKLIGHT_MAX_TICKS as Number = 4;
 
     function initialize(forceRefresh as Boolean) {
         View.initialize();
@@ -34,12 +44,18 @@ class VerseView extends WatchUi.View {
             Application.Storage.deleteValue("openedFromReminder");
         } catch (e) {
         }
+        pokeBacklight();
+        startBacklightTimer();
+    }
+
+    function onHide() as Void {
+        stopBacklightTimer();
     }
 
     function onUpdate(dc as Graphics.Dc) as Void {
         var status = findDrawableById("statusLabel") as WatchUi.Text?;
         var verse = findDrawableById("verseText") as WatchUi.TextArea?;
-        var ref = findDrawableById("refLabel") as WatchUi.Text?;
+        var ref = findDrawableById("refLabel") as WatchUi.TextArea?;
         var ver = findDrawableById("versionLabel") as WatchUi.Text?;
 
         if (status != null) {
@@ -78,6 +94,53 @@ class VerseView extends WatchUi.View {
 
     function refresh() as Void {
         loadVerse(true);
+    }
+
+    //! Keep the display lit / reset the system backlight dim timer.
+    //! Safe no-op when Attention.backlight is missing or the OLED hold limit trips.
+    function pokeBacklight() as Void {
+        if (!(Attention has :backlight)) {
+            return;
+        }
+        try {
+            // API 4.0+ devices accept Float brightness; 1.0 = brightest allowed.
+            Attention.backlight(1.0);
+        } catch (e) {
+            try {
+                Attention.backlight(true);
+            } catch (e2) {
+                // BacklightOnTooLongException / unsupported — stop auto-repeat
+                stopBacklightTimer();
+            }
+        }
+    }
+
+    function onBacklightTimer() as Void {
+        _backlightTicks += 1;
+        if (_backlightTicks > BACKLIGHT_MAX_TICKS) {
+            stopBacklightTimer();
+            return;
+        }
+        pokeBacklight();
+    }
+
+    private function startBacklightTimer() as Void {
+        stopBacklightTimer();
+        _backlightTicks = 0;
+        var timer = new Timer.Timer();
+        _backlightTimer = timer;
+        timer.start(method(:onBacklightTimer), BACKLIGHT_INTERVAL_MS, true);
+    }
+
+    private function stopBacklightTimer() as Void {
+        if (_backlightTimer != null) {
+            try {
+                (_backlightTimer as Timer.Timer).stop();
+            } catch (e) {
+            }
+            _backlightTimer = null;
+        }
+        _backlightTicks = 0;
     }
 
     private function loadVerse(force as Boolean) as Void {
@@ -170,13 +233,24 @@ class VerseDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
+    //! Select / touch must not exit — only reset the backlight dim timer.
     function onSelect() as Boolean {
-        dismiss();
+        keepLit();
         return true;
     }
 
-    //! Both back and select leave the verse, which means leaving the app so the
-    //! watch returns to its watch face instead of idling in the app.
+    function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
+        keepLit();
+        return true;
+    }
+
+    private function keepLit() as Void {
+        if (_view != null) {
+            (_view as VerseView).pokeBacklight();
+        }
+    }
+
+    //! Back leaves the verse (and the app) so the watch returns to its watch face.
     private function dismiss() as Void {
         System.exit();
     }

@@ -21,6 +21,9 @@ class DailyVerseApp extends Application.AppBase {
     function onStart(state as Dictionary?) as Void {
         // Reschedule whenever the app (or background) starts.
         if (!_inBackground) {
+            // Connect Mobile can store a translation that does not belong to the
+            // selected language; coerce before any fetch / menu render.
+            AppConfig.normalize();
             ReminderScheduler.scheduleNext();
         }
     }
