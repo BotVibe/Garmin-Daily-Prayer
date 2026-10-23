@@ -68,14 +68,6 @@ FOOTER = """
 </settings>
 """
 
-# Display labels for translation codes, mirroring Translations.codeDisplayName.
-SPECIAL_LABELS = {"neu": "NeÜ", "nvi_pt": "NVI_PT"}
-
-
-def code_label(code: str) -> str:
-    return SPECIAL_LABELS.get(code, code.upper())
-
-
 def render() -> str:
     languages = extract_language_ids()
     catalog = extract_catalog()
@@ -95,7 +87,9 @@ def render() -> str:
     for lang in languages:
         for code in catalog[lang]:
             index = setting_code_index(code, catalog)
-            out.append(f'            <listEntry value="{index}">{code_label(code)}</listEntry>\n')
+            # Labels live in string resources (Trans_<code>) so Connect localizes
+            # with the rest of the settings UI.
+            out.append(f'            <listEntry value="{index}">@Strings.Trans_{code}</listEntry>\n')
     out.append("        </settingConfig>\n")
     out.append("    </setting>\n")
 

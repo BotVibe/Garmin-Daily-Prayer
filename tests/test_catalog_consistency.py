@@ -80,11 +80,24 @@ def test_string_resources_cover_all_languages() -> None:
     langs = extract_language_ids()
     for path in (
         ROOT / "resources/strings/strings.xml",
-        ROOT / "resources-eng/strings/strings.xml",
+        ROOT / "resources-deu/strings/strings.xml",
+        ROOT / "resources-fre/strings/strings.xml",
     ):
         ids = _string_ids(path)
         for lang in langs:
             assert f"Lang_{lang}" in ids, f"{path} missing Lang_{lang}"
+
+
+def test_string_resources_cover_all_translation_codes() -> None:
+    codes = all_translation_codes()
+    for path in (
+        ROOT / "resources/strings/strings.xml",
+        ROOT / "resources-deu/strings/strings.xml",
+        ROOT / "resources-fre/strings/strings.xml",
+    ):
+        ids = _string_ids(path)
+        for code in codes:
+            assert f"Trans_{code}" in ids, f"{path} missing Trans_{code}"
 
 
 def test_default_properties_are_valid() -> None:

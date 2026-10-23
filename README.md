@@ -8,7 +8,7 @@ Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lä
 | Version | **1.1.0** |
 | API | `https://dailyverses.net/get/verse?language=<code>` |
 | Min. API | Connect IQ **4.0.0** |
-| Sprachen UI | Deutsch (Default), Englisch |
+| Sprachen UI | Englisch (Default), Deutsch, Französisch (folgt der Uhrensprache) |
 | Erinnerungen | Bis zu **3** Zeitslots |
 
 ---
@@ -107,6 +107,7 @@ Der Katalog in [`source/Translations.mc`](source/Translations.mc) entspricht der
 | --- | --- |
 | Deutsch | `elb`, `lu12`, `lut`, `neu` |
 | Englisch | `esv`, `kjv`, `nasb`, `ncb`, `niv`, `nkjv`, `nlt`, `nrsv`, `web` |
+| Französisch | `bds`, `neg79`, `sg21` |
 | Spanisch | `lbla`, `nvi`, `rvr60`, `rvr95` |
 | … | siehe `Translations.codesForLanguage` |
 
@@ -200,7 +201,7 @@ Geräte-Definitionen kommen aus dem Connect IQ SDK Manager (`~/.Garmin/ConnectIQ
 
 Launcher-Icons liegen größenrichtig unter `resources/drawables` (40 px) und `resources-icon-*`. Neu zeichnen: `python3 tools/gen_icons.py`. Die Connect-Settings erzeugt `python3 tools/gen_settings.py` aus `Translations.mc`.
 
-Vorlage für den Store-Upload: [`release/connectiq/BUILD_INFO.md`](release/connectiq/BUILD_INFO.md). Texte und Bilder: [`store/`](store/).
+Vorlage für den Store-Upload: [`release/connectiq/BUILD_INFO.md`](release/connectiq/BUILD_INFO.md). Texte und Bilder: [`store/`](store/) — Listings EN (Master) + DE + FR; Screenshots zeigen die **englische** UI (siehe [`store/README.md`](store/README.md)).
 
 ### Auf die Uhr
 
@@ -225,6 +226,7 @@ Ohne Garmin SDK prüft die GitHub Actions Pipeline (`.github/workflows/ci.yml`) 
 | `tests/test_reminder_schedule.py` | nächste Erinnerungszeit, Due-Guard, Zürich UTC+2 09:00≠11:00, 14:07/22:36 über Tage, Settings-Wechsel |
 | `tests/test_translation_filter.py` | Sprach→Übersetzungs-Filter / Default-Fallback |
 | `tests/test_catalog_consistency.py` | `Translations.mc` ↔ Settings ↔ Strings |
+| `tests/test_string_parity.py` | String-IDs EN ↔ DEU ↔ FRE identisch |
 | `tests/test_manifest.py` | Manifest, Permissions, Background-Invarianten |
 | `tests/test_project_structure.py` | Pflicht-Dateien & Doku-Hinweise |
 

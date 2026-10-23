@@ -36,6 +36,6 @@ sha256sum release/connectiq/app.iq (not committed)
 package. Upload `release/connectiq/app.iq (not committed)` at
 https://apps.garmin.com/developer/dashboard
 
-Store text: `store/listing-de.md` (primary), `store/listing-en.md`.
-Privacy text: `store/privacy-de.md`, `store/privacy-en.md`.
-Screenshots and icons: `store/assets/`.
+Store text: `store/listing-en.md` (master), `store/listing-de.md`, `store/listing-fr.md`.
+Privacy text: `store/privacy-en.md`, `store/privacy-de.md`.
+Screenshots and icons: `store/assets/` (screenshots show the English UI).

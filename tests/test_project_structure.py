@@ -22,7 +22,8 @@ REQUIRED_FILES = [
     "resources/properties/properties.xml",
     "resources/settings/settings.xml",
     "resources/strings/strings.xml",
-    "resources-eng/strings/strings.xml",
+    "resources-deu/strings/strings.xml",
+    "resources-fre/strings/strings.xml",
     "resources/layouts/verse.xml",
     "resources/drawables/launcher_icon.png",
     ".github/workflows/ci.yml",
@@ -36,10 +37,12 @@ REQUIRED_FILES = [
     "release/connectiq/BUILD_INFO.md",
     "store/listing-de.md",
     "store/listing-en.md",
+    "store/listing-fr.md",
+    "store/README.md",
     "store/privacy-de.md",
     "store/privacy-en.md",
     "store/assets/store_icon_500.png",
-    "store/assets/screenshots/01-verse-de.png",
+    "store/assets/screenshots/01-verse-en.png",
 ]
 
 
@@ -49,7 +52,11 @@ def test_required_project_files_exist() -> None:
 
 
 def test_app_name_and_version_are_consistent() -> None:
-    for rel in ("resources/strings/strings.xml", "resources-eng/strings/strings.xml"):
+    for rel in (
+        "resources/strings/strings.xml",
+        "resources-deu/strings/strings.xml",
+        "resources-fre/strings/strings.xml",
+    ):
         root = ET.parse(ROOT / rel).getroot()
         strings = {el.attrib["id"]: (el.text or "") for el in root.findall("string")}
         assert strings["AppName"] == "Daily Verse", rel
@@ -63,26 +70,34 @@ def test_app_name_and_version_are_consistent() -> None:
 
 
 def test_store_listing_basics() -> None:
-    for rel in ("store/listing-de.md", "store/listing-en.md"):
+    for rel in ("store/listing-de.md", "store/listing-en.md", "store/listing-fr.md"):
         text = (ROOT / rel).read_text(encoding="utf-8")
         assert "Daily Verse" in text
         assert "https://github.com/BotVibe/Garmin-Daily-Prayer/issues" in text
         assert "https://dailyverses.net/" in text
     german = (ROOT / "store/listing-de.md").read_text(encoding="utf-8")
     assert "Bibelvers des Tages" in german
+    french = (ROOT / "store/listing-fr.md").read_text(encoding="utf-8")
+    assert "verset biblique du jour" in french
     shots = list((ROOT / "store/assets/screenshots").glob("*.png"))
     assert len(shots) >= 4
+    assert (ROOT / "store/assets/screenshots/01-verse-en.png").is_file()
 
 
 def test_short_descriptions_fit_the_store_field() -> None:
     """The Connect IQ short description field allows 255 characters."""
     import re
 
-    for rel in ("store/listing-de.md", "store/listing-en.md"):
+    for rel in ("store/listing-de.md", "store/listing-en.md", "store/listing-fr.md"):
         text = (ROOT / rel).read_text(encoding="utf-8")
-        match = re.search(r"## Kurzbeschreibung\n\n(.+)\n|## Short description\n\n(.+)\n", text)
+        match = re.search(
+            r"## Kurzbeschreibung\n\n(.+)\n"
+            r"|## Short description\n\n(.+)\n"
+            r"|## Description courte\n\n(.+)\n",
+            text,
+        )
         assert match, rel
-        short = match.group(1) or match.group(2)
+        short = match.group(1) or match.group(2) or match.group(3)
         assert len(short) <= 255, f"{rel} short description is {len(short)} characters"
 
 

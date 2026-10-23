@@ -1,6 +1,8 @@
-# Daily Verse — store listing (English)
+# Daily Verse — store listing (English, master)
 
 Price: free. Public app, not a beta.
+
+Store texts ship in English (this file, default), German (`listing-de.md`), and French (`listing-fr.md`). Screenshots and promotional images in `store/assets/` show the English UI.
 
 ## Name
 

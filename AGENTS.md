@@ -15,7 +15,7 @@ Connect IQ **watch-app**, die:
 - Sprache + Bibelübersetzung (inkl. zufällig pro Sprache) einstellen lässt,
 - **energieeffizient** arbeitet (kein Polling, Tages-Cache, ein TemporalEvent).
 
-UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
+UI-Default: **Englisch** (`resources`). Weitere UI-Sprachen: Deutsch (`resources-deu`), Französisch (`resources-fre`). Die Uhrensprache wählt das Overlay automatisch.
 
 ---
 
@@ -45,10 +45,10 @@ UI-Default: **Deutsch**. Zweite UI-Sprache: Englisch (`resources-eng`).
 | UI Vers | `source/VerseView.mc`, `resources/layouts/verse.xml`, `resources-round-*/` |
 | UI Home (optional) | `source/HomeView.mc` (Default-Entry ist VerseView) |
 | UI Settings | `source/SettingsMenu.mc`, `source/NumberFactory.mc` (Zeit-Picker) |
-| Strings | `resources/strings/strings.xml`, `resources-eng/strings/strings.xml` |
+| Strings | `resources/strings/strings.xml` (EN), `resources-deu/…`, `resources-fre/…` |
 | CI / Tests | `.github/workflows/ci.yml`, `tests/`, `tools/dailyverse_lib/`, `requirements-dev.txt` |
 | Build-Skripte | `scripts/build.sh`, `scripts/test.sh`, `scripts/export.sh`, `scripts/fetch_devices.sh` |
-| Store | `store/listing-de.md`, `store/listing-en.md`, `store/privacy-*.md`, `store/assets/` |
+| Store | `store/listing-en.md` (Master), `listing-de.md`, `listing-fr.md`, `store/README.md`, `store/privacy-*.md`, `store/assets/` (Screenshots: englische UI) |
 | Release | `CHANGELOG.md`, `release/connectiq/BUILD_INFO.md`, `LICENSE` |
 | Auto-Merge | `.github/workflows/auto-merge.yml` (nach grüner CI → squash in `main`, keine Drafts) |
 | Parser-Smoke | `tools/verify_verse_parse.py` (nutzt `dailyverse_lib`) |
@@ -90,7 +90,7 @@ Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` üb
 
 | Änderung | Pflicht-Updates |
 | --- | --- |
-| Neue Sprache / Übersetzung | `Translations.mc`, `settings.xml`, Strings (`Lang_*`), **README** (Tabelle), **AGENTS** (falls Invariante/Katalogbeschreibung) |
+| Neue Sprache / Übersetzung | `Translations.mc`, `settings.xml`, Strings (`Lang_*`, `Trans_*` in EN/DEU/FRE), **README** (Tabelle), **AGENTS** (falls Invariante/Katalogbeschreibung) |
 | Erinnerungslogik / Slot-Anzahl | `AppConfig`, `ReminderScheduler`, `properties.xml`, `settings.xml`, Settings-UI, **README**, **AGENTS** |
 | API-URL oder Parse-Format | `VerseApi.mc`, `tools/dailyverse_lib/parse.py`, `tests/test_verse_parse.py`, **README**, **AGENTS** |
 | Katalog Sprache/Übersetzung | `Translations.mc`, Settings/Strings, `tools/dailyverse_lib/catalog.py`, `tests/test_catalog_consistency.py`, **README**, **AGENTS** |
@@ -136,7 +136,7 @@ Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` üb
 - `makeWebRequest` braucht Phone-Link.
 - Ungültige `<iq:product id>` im Manifest brechen den Build — nur dokumentierte Device-IDs. SDK 9.2.0 kennt `fenix7pronowifi` und `fenix7xpronowifi` nicht.
 - `String` hat kein `trim()`. Whitespace in `VerseApi.trim` selbst entfernen.
-- Sprach-Ressourcen nicht per `eng.resourcePath` anhängen. Der Default-Jungle mappt `resources-<lang>` auf `base.lang.<lang>`.
+- Sprach-Ressourcen nicht per `deu.resourcePath` / `fre.resourcePath` anhängen. Der Default-Jungle mappt `resources-<lang>` auf `base.lang.<lang>` (Default-Strings = Englisch in `resources/`).
 - Connect-Settings vom Typ `list` akzeptieren nur numerische `listEntry`-Werte und können nicht von einer anderen Setting abhängen. `settings.xml` kommt aus `tools/gen_settings.py`.
 - Layouts erzeugen Custom-Drawables mit einem Parameter-Dictionary. `initialize(params)` muss es an `Drawable.initialize` weiterreichen.
 - `Attention.backlight`: Feature-Check (`Attention has :backlight`); auf OLED kann längeres Halten `BacklightOnTooLongException` werfen (~1 Min). System-Timeout der Hintergrundbeleuchtung bleibt maßgeblich; die App kann nur erneut anstoßen, nicht dauerhaft erzwingen.

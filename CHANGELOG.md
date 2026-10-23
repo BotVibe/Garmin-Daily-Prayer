@@ -7,6 +7,11 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Changed
+
+- Watch UI and Connect settings follow the watch language: **English** (default `resources`), **German** (`resources-deu`), **French** (`resources-fre`). Removed `resources-eng`; English no longer falls back to German on non-English watches.
+- Store listings exist in English (master), German, and French; store screenshots show the English UI.
+
 ## [1.1.0] - 2026-10-23
 
 ### Fixed
