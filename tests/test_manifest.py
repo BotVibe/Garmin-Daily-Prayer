@@ -89,8 +89,28 @@ def test_reminder_scheduler_uses_local_clock_not_utc_moment() -> None:
     text = (ROOT / "source" / "ReminderScheduler.mc").read_text(encoding="utf-8")
     assert "momentForLocalClock" in text
     assert "getLastTemporalEventTime" in text
+    assert "isReminderDueNow" in text
     # Must not call Gregorian.moment(...) with local HH:MM (UTC options).
     assert not re.search(r"Gregorian\.moment\s*\(", text)
+    # Must not register a non-slot "now+5min" catch-up wake.
+    assert "earliestLegalSeconds()" not in re.findall(
+        r"registerForTemporalEvent\([^)]+\)", text
+    ) or all(
+        "earliestLegal" not in call
+        for call in re.findall(r"registerForTemporalEvent\(([^)]+)\)", text)
+    )
+
+
+def test_background_wake_only_when_reminder_due() -> None:
+    text = (ROOT / "source" / "BackgroundService.mc").read_text(encoding="utf-8")
+    assert "isReminderDueNow" in text
+    assert "requestApplicationWake" in text
+    # Guard must precede the wake request.
+    due_pos = text.index("isReminderDueNow")
+    wake_pos = text.index("requestApplicationWake")
+    assert due_pos < wake_pos
+    assert "makeWebRequest" not in text
+    assert "VerseApi" not in text
 
 
 def test_settings_menu_filters_translations_and_uses_time_picker() -> None:
