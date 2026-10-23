@@ -33,7 +33,7 @@ Bible, verse, verse of the day, devotion, prayer, reminder, Daily Verse, DailyVe
 
 ## What's New
 
-First release. The verse of the day, up to three reminders, a choice of language and translation, and the last loaded verse when the phone is out of reach.
+Reminders now arrive at the time set on your watch (in your time zone), once a day per active reminder, with no extra alerts. New side-by-side hour and minute picker. The translation list only shows translations for the chosen language. Tapping the verse keeps the screen lit instead of closing the app. Long Bible references wrap instead of being cut off.
 
 ## Support
 

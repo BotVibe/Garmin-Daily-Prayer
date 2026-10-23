@@ -53,11 +53,12 @@ def test_app_name_and_version_are_consistent() -> None:
         root = ET.parse(ROOT / rel).getroot()
         strings = {el.attrib["id"]: (el.text or "") for el in root.findall("string")}
         assert strings["AppName"] == "Daily Verse", rel
-        assert strings["AppVersion"] == "1.0.0", rel
+        assert strings["AppVersion"] == "1.1.0", rel
     props = ET.parse(ROOT / "resources/properties/properties.xml").getroot()
     version = next(el for el in props.findall("property") if el.attrib["id"] == "appVersion")
-    assert (version.text or "").strip() == "1.0.0"
+    assert (version.text or "").strip() == "1.1.0"
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert "## [1.1.0]" in changelog
     assert "## [1.0.0]" in changelog
 
 

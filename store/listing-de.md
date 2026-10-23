@@ -35,7 +35,7 @@ Bibel, Bibelvers, Vers des Tages, Andacht, Gebet, Erinnerung, Daily Verse, Daily
 
 ## Was ist neu
 
-Erste Veröffentlichung. Täglicher Bibelvers, bis zu drei Erinnerungen, Wahl von Sprache und Übersetzung, und der zuletzt geladene Vers auch ohne Verbindung.
+Erinnerungen kommen jetzt zur auf der Uhr eingestellten Zeit (in deiner Zeitzone), einmal täglich pro aktiver Erinnerung und ohne zusätzliche Alarme. Neue Zeitauswahl mit Stunden und Minuten nebeneinander. Die Übersetzungsliste zeigt nur Übersetzungen der gewählten Sprache. Tippen auf den Vers hält die Anzeige hell, statt die App zu beenden. Lange Bibelstellen werden umgebrochen statt abgeschnitten.
 
 ## Support
 

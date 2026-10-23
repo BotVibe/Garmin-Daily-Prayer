@@ -1,6 +1,6 @@
 <properties>
     <!-- Shown read-only in the settings; keep in sync with CHANGELOG.md. -->
-    <property id="appVersion" type="string">1.0.0</property>
+    <property id="appVersion" type="string">1.1.0</property>
 
     <!-- Catalog position of the language in Translations.languageIds() ("de"). -->
     <property id="languageIndex" type="number">6</property>

@@ -7,6 +7,8 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-23
+
 ### Fixed
 
 - Reminder times now fire at the configured **local** watch clock time (time zone + DST). Scheduling no longer feeds local hour/minute into `Gregorian.moment` (UTC), which caused ~1–2 hour skew (e.g. 09:00 → ~10:00 in CET, **09:00 → 11:00 in CEST / Zurich UTC+2**). The remaining minutes of delay come from the platform 5-minute temporal-event rule / wake latency. Scheduling also respects `Background.getLastTemporalEventTime`.
@@ -19,7 +21,7 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 - Reminder time editing uses a two-column hour∶minute wheel picker (`WatchUi.Picker`) instead of separate hour/minute lists.
 - Tapping / Select on the verse screen no longer exits the app; only Back returns to the watch face. Tap re-triggers the backlight where `Attention.backlight` is available (OLED devices may refuse continuous hold after ~1 minute).
 
-### Guaranteed reminder behaviour
+### Reminder behaviour (guaranteed)
 
 - Each **enabled** slot fires once per local calendar day at its HH:MM (watch clock), until changed.
 - Disabled slots never fire. All disabled → no TemporalEvent / no wakes.

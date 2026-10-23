@@ -1,7 +1,7 @@
 <strings>
     <string id="AppName">Daily Verse</string>
     <string id="AppNameShort">Daily Verse</string>
-    <string id="AppVersion">1.0.0</string>
+    <string id="AppVersion">1.1.0</string>
 
     <string id="WakeMessage">Daily Verse</string>
     <string id="Loading">Loading verse…</string>
