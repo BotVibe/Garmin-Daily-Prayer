@@ -1,4 +1,4 @@
-# Daily Verse — Store-Eintrag (Deutsch, primär)
+# Daily Verse — Store-Eintrag (Deutsch)
 
 Preis: kostenlos. Öffentliche App, kein Beta.
 

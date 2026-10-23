@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Render store screenshots that follow the on-device layout.
+"""Render store screenshots that follow the on-device layout (English UI).
 
-The verse screen itself is captured from the Connect IQ simulator
-(store/assets/screenshots/01-verse-de.png) and is not regenerated here.
 Menu screens use the system menu, whose typeface is not in the public device
-font pack, so those screens are drawn from the real string resources and the
-same colours as the app.
+font pack, so those screens are drawn from the English string resources and the
+same colours as the app. The verse screen is rendered the same way for a
+consistent English store pack.
 
     python3 tools/gen_screenshots.py
 """
@@ -93,7 +92,6 @@ def draw_centered(
 def render_verse_en() -> Image.Image:
     image = verse_background()
     draw = ImageDraw.Draw(image)
-    # Today's NIV text, the same verse the German simulator capture shows.
     text = (
         "The LORD will be king over the whole earth. "
         "On that day there will be one LORD, and his name the only name."
@@ -116,8 +114,8 @@ def render_verse_long_reference(*, size: int = SIZE) -> Image.Image:
         image = verse_background()
         draw = ImageDraw.Draw(image)
         text = (
-            "Und der HERR wird König sein über die ganze Erde; "
-            "an jenem Tag wird der HERR einzig sein und sein Name einzig."
+            "The LORD will be king over the whole earth. "
+            "On that day there will be one LORD, and his name the only name."
         )
         face = font(20 if size <= 360 else 22)
         lines = wrap(draw, text, face, int(SIZE * 0.76))
@@ -126,12 +124,12 @@ def render_verse_long_reference(*, size: int = SIZE) -> Image.Image:
         ref_face = font(18 if size <= 360 else 20)
         ref_lines = wrap(
             draw,
-            "Das erste Buch der Chronik 29:11-13",
+            "The First Book of Chronicles 29:11-13",
             ref_face,
             int(SIZE * 0.76),
         )
         draw_centered(draw, ref_lines, ref_face, int(SIZE * 0.72), GOLD, 4)
-        draw_centered(draw, ["LUT"], font(14), int(SIZE * 0.88), GRAY, 0)
+        draw_centered(draw, ["NIV"], font(14), int(SIZE * 0.88), GRAY, 0)
         return finish(image)
     finally:
         SIZE = old
@@ -141,7 +139,7 @@ def render_time_picker(hour: int = 9, minute: int = 0) -> Image.Image:
     """Approximate WatchUi.Picker with two NumberFactory columns (hour : minute)."""
     image = Image.new("RGB", (SIZE, SIZE), MENU_BG)
     draw = ImageDraw.Draw(image)
-    draw_centered(draw, ["Uhrzeit"], font(22, bold=True), 42, WHITE, 0)
+    draw_centered(draw, ["Time"], font(22, bold=True), 42, WHITE, 0)
 
     # Selection band
     band_top = SIZE // 2 - 28
@@ -215,33 +213,45 @@ def main() -> None:
     pr_out = ROOT / "store" / "assets" / "pr-screenshots"
     pr_out.mkdir(parents=True, exist_ok=True)
 
+    # Remove legacy German-named store shots so the pack stays English-only.
+    for legacy in (
+        "01-verse-de.png",
+        "02-settings-de.png",
+        "03-language-de.png",
+        "04-reminders-de.png",
+        "05-verse-en.png",
+    ):
+        path = OUT / legacy
+        if path.exists():
+            path.unlink()
+
     shots = {
-        "02-settings-de.png": render_menu(
-            "Einstellungen",
+        "01-verse-en.png": render_verse_en(),
+        "02-settings-en.png": render_menu(
+            "Settings",
             [
-                ("Sprache", "Deutsch"),
-                ("Bibelübersetzung", "LUT"),
-                ("Erinnerungen", "08:00"),
+                ("Language", "German"),
+                ("Bible translation", "LUT"),
+                ("Reminders", "08:00"),
             ],
         ),
-        "03-language-de.png": render_menu(
-            "Sprache",
+        "03-language-en.png": render_menu(
+            "Language",
             [
-                ("Deutsch", "✓"),
-                ("Englisch", None),
-                ("Spanisch", None),
+                ("German", "✓"),
+                ("English", None),
+                ("Spanish", None),
             ],
             selected=0,
         ),
-        "04-reminders-de.png": render_menu(
-            "Erinnerungen",
+        "04-reminders-en.png": render_menu(
+            "Reminders",
             [
-                ("Erinnerung 1", "08:00 · An"),
-                ("Erinnerung 2", "Aus"),
-                ("Erinnerung 3", "Aus"),
+                ("Reminder 1", "08:00 · On"),
+                ("Reminder 2", "Off"),
+                ("Reminder 3", "Off"),
             ],
         ),
-        "05-verse-en.png": render_verse_en(),
     }
     for name, image in shots.items():
         path = OUT / name

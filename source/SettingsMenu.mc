@@ -55,7 +55,7 @@ class SettingsMainMenu extends WatchUi.Menu2 {
         if (code.equals(Translations.RANDOM_CODE)) {
             return WatchUi.loadResource(Rez.Strings.TranslationRandom) as String;
         }
-        return Translations.codeDisplayName(code);
+        return translationName(code);
     }
 
     function remindersSubtitle() as String {
@@ -159,7 +159,7 @@ class TranslationMenu extends WatchUi.Menu2 {
         for (var i = 0; i < codes.size(); i++) {
             var code = codes[i] as String;
             addItem(new WatchUi.MenuItem(
-                Translations.codeDisplayName(code),
+                translationName(code),
                 current.equals(code) ? "✓" : null,
                 code,
                 null
@@ -329,6 +329,68 @@ class SlotTimePickerDelegate extends WatchUi.PickerDelegate {
         WatchUi.pushView(new SlotMenu(_slot), new SlotMenuDelegate(_slot), WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
+}
+
+function translationName(code as String) as String {
+    if (code.equals("afr53")) { return WatchUi.loadResource(Rez.Strings.Trans_afr53) as String; }
+    if (code.equals("avd")) { return WatchUi.loadResource(Rez.Strings.Trans_avd) as String; }
+    if (code.equals("keh")) { return WatchUi.loadResource(Rez.Strings.Trans_keh) as String; }
+    if (code.equals("rovu")) { return WatchUi.loadResource(Rez.Strings.Trans_rovu) as String; }
+    if (code.equals("cuv")) { return WatchUi.loadResource(Rez.Strings.Trans_cuv) as String; }
+    if (code.equals("cuvs")) { return WatchUi.loadResource(Rez.Strings.Trans_cuvs) as String; }
+    if (code.equals("b21")) { return WatchUi.loadResource(Rez.Strings.Trans_b21) as String; }
+    if (code.equals("cep")) { return WatchUi.loadResource(Rez.Strings.Trans_cep) as String; }
+    if (code.equals("bdan")) { return WatchUi.loadResource(Rez.Strings.Trans_bdan) as String; }
+    if (code.equals("da1871")) { return WatchUi.loadResource(Rez.Strings.Trans_da1871) as String; }
+    if (code.equals("elb")) { return WatchUi.loadResource(Rez.Strings.Trans_elb) as String; }
+    if (code.equals("lu12")) { return WatchUi.loadResource(Rez.Strings.Trans_lu12) as String; }
+    if (code.equals("lut")) { return WatchUi.loadResource(Rez.Strings.Trans_lut) as String; }
+    if (code.equals("neu")) { return WatchUi.loadResource(Rez.Strings.Trans_neu) as String; }
+    if (code.equals("esv")) { return WatchUi.loadResource(Rez.Strings.Trans_esv) as String; }
+    if (code.equals("kjv")) { return WatchUi.loadResource(Rez.Strings.Trans_kjv) as String; }
+    if (code.equals("nasb")) { return WatchUi.loadResource(Rez.Strings.Trans_nasb) as String; }
+    if (code.equals("ncb")) { return WatchUi.loadResource(Rez.Strings.Trans_ncb) as String; }
+    if (code.equals("niv")) { return WatchUi.loadResource(Rez.Strings.Trans_niv) as String; }
+    if (code.equals("nkjv")) { return WatchUi.loadResource(Rez.Strings.Trans_nkjv) as String; }
+    if (code.equals("nlt")) { return WatchUi.loadResource(Rez.Strings.Trans_nlt) as String; }
+    if (code.equals("nrsv")) { return WatchUi.loadResource(Rez.Strings.Trans_nrsv) as String; }
+    if (code.equals("web")) { return WatchUi.loadResource(Rez.Strings.Trans_web) as String; }
+    if (code.equals("lbla")) { return WatchUi.loadResource(Rez.Strings.Trans_lbla) as String; }
+    if (code.equals("nvi")) { return WatchUi.loadResource(Rez.Strings.Trans_nvi) as String; }
+    if (code.equals("rvr60")) { return WatchUi.loadResource(Rez.Strings.Trans_rvr60) as String; }
+    if (code.equals("rvr95")) { return WatchUi.loadResource(Rez.Strings.Trans_rvr95) as String; }
+    if (code.equals("pcb")) { return WatchUi.loadResource(Rez.Strings.Trans_pcb) as String; }
+    if (code.equals("kr38")) { return WatchUi.loadResource(Rez.Strings.Trans_kr38) as String; }
+    if (code.equals("kr92")) { return WatchUi.loadResource(Rez.Strings.Trans_kr92) as String; }
+    if (code.equals("bds")) { return WatchUi.loadResource(Rez.Strings.Trans_bds) as String; }
+    if (code.equals("neg79")) { return WatchUi.loadResource(Rez.Strings.Trans_neg79) as String; }
+    if (code.equals("sg21")) { return WatchUi.loadResource(Rez.Strings.Trans_sg21) as String; }
+    if (code.equals("tgv")) { return WatchUi.loadResource(Rez.Strings.Trans_tgv) as String; }
+    if (code.equals("hhbd")) { return WatchUi.loadResource(Rez.Strings.Trans_hhbd) as String; }
+    if (code.equals("uf")) { return WatchUi.loadResource(Rez.Strings.Trans_uf) as String; }
+    if (code.equals("cei")) { return WatchUi.loadResource(Rez.Strings.Trans_cei) as String; }
+    if (code.equals("lnd")) { return WatchUi.loadResource(Rez.Strings.Trans_lnd) as String; }
+    if (code.equals("nr06")) { return WatchUi.loadResource(Rez.Strings.Trans_nr06) as String; }
+    if (code.equals("mg1865")) { return WatchUi.loadResource(Rez.Strings.Trans_mg1865) as String; }
+    if (code.equals("bb")) { return WatchUi.loadResource(Rez.Strings.Trans_bb) as String; }
+    if (code.equals("bgt")) { return WatchUi.loadResource(Rez.Strings.Trans_bgt) as String; }
+    if (code.equals("hsv")) { return WatchUi.loadResource(Rez.Strings.Trans_hsv) as String; }
+    if (code.equals("nbg")) { return WatchUi.loadResource(Rez.Strings.Trans_nbg) as String; }
+    if (code.equals("nbv")) { return WatchUi.loadResource(Rez.Strings.Trans_nbv) as String; }
+    if (code.equals("b2024")) { return WatchUi.loadResource(Rez.Strings.Trans_b2024) as String; }
+    if (code.equals("bw1975")) { return WatchUi.loadResource(Rez.Strings.Trans_bw1975) as String; }
+    if (code.equals("ubg")) { return WatchUi.loadResource(Rez.Strings.Trans_ubg) as String; }
+    if (code.equals("ara")) { return WatchUi.loadResource(Rez.Strings.Trans_ara) as String; }
+    if (code.equals("arc")) { return WatchUi.loadResource(Rez.Strings.Trans_arc) as String; }
+    if (code.equals("nvi_pt")) { return WatchUi.loadResource(Rez.Strings.Trans_nvi_pt) as String; }
+    if (code.equals("rst")) { return WatchUi.loadResource(Rez.Strings.Trans_rst) as String; }
+    if (code.equals("kat")) { return WatchUi.loadResource(Rez.Strings.Trans_kat) as String; }
+    if (code.equals("sso89")) { return WatchUi.loadResource(Rez.Strings.Trans_sso89) as String; }
+    if (code.equals("b2000")) { return WatchUi.loadResource(Rez.Strings.Trans_b2000) as String; }
+    if (code.equals("urd")) { return WatchUi.loadResource(Rez.Strings.Trans_urd) as String; }
+    if (code.equals("xho96")) { return WatchUi.loadResource(Rez.Strings.Trans_xho96) as String; }
+    if (code.equals("zul59")) { return WatchUi.loadResource(Rez.Strings.Trans_zul59) as String; }
+    return Translations.codeDisplayName(code);
 }
 
 function languageName(langId as String) as String {

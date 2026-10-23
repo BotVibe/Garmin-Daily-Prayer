@@ -206,7 +206,7 @@ class VerseView extends WatchUi.View {
         _fromCache = stale;
         _verseText = text;
         _reference = reference;
-        _version = Translations.codeDisplayName(apiCode);
+        _version = translationName(apiCode);
         WatchUi.requestUpdate();
     }
 }
