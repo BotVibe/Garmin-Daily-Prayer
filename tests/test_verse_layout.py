@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tools.dailyverse_lib.verse_layout import (
+from dailyverse_lib.verse_layout import (
     build_scroll_lines,
     clamp_scroll_offset,
     more_content_below,
