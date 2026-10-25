@@ -52,8 +52,10 @@ def verse_background() -> Image.Image:
     image = Image.new("RGB", (SIZE, SIZE), TEAL)
     draw = ImageDraw.Draw(image)
     draw.ellipse((0, 0, SIZE - 1, SIZE - 1), fill=TEAL_RING)
-    inner = int(SIZE * 3 / 10)
-    draw.ellipse((inner, inner, SIZE - 1 - inner, SIZE - 1 - inner), fill=TEAL)
+    # BackgroundDrawable: inner disc radius = (r * 3) / 5 with r = SIZE / 2.
+    radius = (SIZE // 2) * 3 // 5
+    c = SIZE // 2
+    draw.ellipse((c - radius, c - radius, c + radius, c + radius), fill=TEAL)
     return image
 
 
@@ -284,19 +286,19 @@ def main() -> None:
         "02-settings-en.png": render_menu(
             "Settings",
             [
-                ("Language", "German"),
-                ("Bible translation", "LUT"),
+                ("Language", "English"),
+                ("Bible translation", "NIV"),
                 ("Reminders", "08:00"),
             ],
         ),
         "03-language-en.png": render_menu(
             "Language",
             [
-                ("German", "✓"),
-                ("English", None),
+                ("German", None),
+                ("English", "✓"),
                 ("Spanish", None),
             ],
-            selected=0,
+            selected=1,
         ),
         "04-reminders-en.png": render_menu(
             "Reminders",
@@ -306,6 +308,7 @@ def main() -> None:
                 ("Reminder 3", "Off"),
             ],
         ),
+        "05-long-verse-scroll-en.png": render_verse_long_scrolled(at_bottom=False, size=SIZE),
     }
     for name, image in shots.items():
         path = OUT / name

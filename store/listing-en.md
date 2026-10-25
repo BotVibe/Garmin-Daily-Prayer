@@ -23,7 +23,10 @@ How to use it:
 3. Choose a language and a Bible translation. "Random (language)" picks one translation of that language for the day and keeps it until midnight.
 4. Turn on up to three reminder times.
 5. At a reminder, choose Accept to see the verse. Decline leaves the watch as it is, and the next reminder stays scheduled.
-6. Back closes the app and returns to the watch face. Tapping the screen keeps it lit and does not exit.
+6. Long verses scroll: swipe up and down on touch watches, or use the Up and Down buttons. The Bible reference follows at the end of the verse.
+7. Back closes the app and returns to the watch face. Tapping the screen keeps it lit at your watch's brightness and does not exit.
+
+The app and its settings in Garmin Connect are in English, German and French, following your watch language. Verses are available in many languages, including the French translations BDS, NEG79 and SG21.
 
 The verse is stored for the current day. With no phone connection the app shows the last verse it loaded.
 
@@ -35,7 +38,7 @@ Bible, verse, verse of the day, devotion, prayer, reminder, Daily Verse, DailyVe
 
 ## What's New
 
-Reminders now arrive at the time set on your watch (in your time zone), once a day per active reminder, with no extra alerts. New side-by-side hour and minute picker. The translation list only shows translations for the chosen language. Tapping the verse keeps the screen lit instead of closing the app. Long Bible references wrap instead of being cut off.
+The app and its settings are now available in English, German and French. Long verses are no longer cut off: scroll to read the whole verse, with the Bible reference at the end. The screen stays on longer at your own brightness instead of switching to maximum.
 
 ## Support
 

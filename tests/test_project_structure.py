@@ -61,11 +61,12 @@ def test_app_name_and_version_are_consistent() -> None:
         root = ET.parse(ROOT / rel).getroot()
         strings = {el.attrib["id"]: (el.text or "") for el in root.findall("string")}
         assert strings["AppName"] == "Daily Verse", rel
-        assert strings["AppVersion"] == "1.1.0", rel
+        assert strings["AppVersion"] == "1.2.0", rel
     props = ET.parse(ROOT / "resources/properties/properties.xml").getroot()
     version = next(el for el in props.findall("property") if el.attrib["id"] == "appVersion")
-    assert (version.text or "").strip() == "1.1.0"
+    assert (version.text or "").strip() == "1.2.0"
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert "## [1.2.0]" in changelog
     assert "## [1.1.0]" in changelog
     assert "## [1.0.0]" in changelog
 
@@ -108,3 +109,13 @@ def test_readme_and_agents_mention_ci() -> None:
     assert "GitHub Actions" in readme or "CI" in readme
     assert "pytest" in readme.lower() or "tests/" in readme
     assert "pytest" in agents.lower() or "tests/" in agents
+
+
+def test_manifest_declares_every_resource_language() -> None:
+    """monkeyc silently ignores resources-<lang>/ unless the language is in the manifest."""
+    root = ET.parse(ROOT / "manifest.xml").getroot()
+    langs = {(el.text or "").strip() for el in root.iter() if el.tag.endswith("}language")}
+    for folder in ROOT.glob("resources-*"):
+        if (folder / "strings").is_dir():
+            assert folder.name.split("-", 1)[1] in langs, folder.name
+    assert {"eng", "deu", "fre"} <= langs

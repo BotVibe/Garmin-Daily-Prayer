@@ -23,7 +23,10 @@ So benutzt du die App:
 3. Wähle Sprache und Bibelübersetzung. „Zufällig (Sprache)“ nimmt für den Tag eine Übersetzung der gewählten Sprache und behält sie bis Mitternacht.
 4. Schalte unter Erinnerungen bis zu drei Uhrzeiten ein.
 5. Zur eingestellten Zeit auf Annehmen tippen zeigt den Vers. Ablehnen lässt die Uhr, wie sie ist; die nächste Erinnerung bleibt geplant.
-6. Zurück beendet die App und kehrt zum Zifferblatt zurück. Tippen hält die Anzeige hell und beendet die App nicht.
+6. Lange Verse lassen sich scrollen: auf Touch-Uhren nach oben und unten wischen, sonst mit den Tasten Hoch und Runter. Die Bibelstelle steht am Ende des Verses.
+7. Zurück beendet die App und kehrt zum Zifferblatt zurück. Tippen hält die Anzeige in der Helligkeit deiner Uhr an und beendet die App nicht.
+
+Die App und ihre Einstellungen in Garmin Connect gibt es auf Englisch, Deutsch und Französisch, passend zur Sprache der Uhr. Verse gibt es in vielen Sprachen, darunter die französischen Übersetzungen BDS, NEG79 und SG21.
 
 Der Vers wird für den aktuellen Tag gespeichert. Ohne Verbindung zum Telefon zeigt die App den zuletzt geladenen Vers.
 
@@ -35,7 +38,7 @@ Bibel, Bibelvers, Vers des Tages, Andacht, Gebet, Erinnerung, Daily Verse, Daily
 
 ## Was ist neu
 
-Erinnerungen kommen jetzt zur auf der Uhr eingestellten Zeit (in deiner Zeitzone), einmal täglich pro aktiver Erinnerung und ohne zusätzliche Alarme. Neue Zeitauswahl mit Stunden und Minuten nebeneinander. Die Übersetzungsliste zeigt nur Übersetzungen der gewählten Sprache. Tippen auf den Vers hält die Anzeige hell, statt die App zu beenden. Lange Bibelstellen werden umgebrochen statt abgeschnitten.
+Die App und ihre Einstellungen gibt es jetzt auf Englisch, Deutsch und Französisch. Lange Verse werden nicht mehr abgeschnitten: Scrolle, um den ganzen Vers zu lesen, die Bibelstelle steht am Ende. Die Anzeige bleibt länger in deiner eingestellten Helligkeit an, statt auf Maximum zu schalten.
 
 ## Support
 

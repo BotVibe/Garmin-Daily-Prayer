@@ -21,7 +21,10 @@ Comment l’utiliser :
 3. Choisissez une langue et une traduction biblique. « Aléatoire (langue) » sélectionne une traduction de cette langue pour la journée et la conserve jusqu’à minuit.
 4. Activez jusqu’à trois heures de rappel.
 5. À l’heure d’un rappel, choisissez Accepter pour voir le verset. Refuser laisse la montre telle quelle, et le prochain rappel reste planifié.
-6. Retour ferme l’application et revient au cadran. Toucher l’écran le maintient allumé et ne quitte pas l’application.
+6. Les longs versets défilent : balayez vers le haut et vers le bas sur les montres tactiles, ou utilisez les boutons Haut et Bas. La référence biblique suit à la fin du verset.
+7. Retour ferme l’application et revient au cadran. Toucher l’écran le maintient allumé à la luminosité de votre montre et ne quitte pas l’application.
+
+L’application et ses réglages dans Garmin Connect sont disponibles en anglais, en allemand et en français, selon la langue de votre montre. Les versets sont disponibles dans de nombreuses langues, dont les traductions françaises BDS, NEG79 et SG21.
 
 Le verset est enregistré pour le jour en cours. Sans connexion au téléphone, l’application affiche le dernier verset chargé.
 
@@ -33,7 +36,7 @@ Bible, verset, verset du jour, dévotion, prière, rappel, Daily Verse, DailyVer
 
 ## Nouveautés
 
-Les rappels arrivent désormais à l’heure réglée sur votre montre (dans votre fuseau horaire), une fois par jour et par rappel actif, sans alertes supplémentaires. Nouveau sélecteur côte à côte heure et minute. La liste des traductions n’affiche que celles de la langue choisie. Toucher le verset maintient l’écran allumé au lieu de fermer l’application. Les longues références bibliques passent à la ligne au lieu d’être coupées.
+L’application et ses réglages sont désormais disponibles en anglais, en allemand et en français. Les longs versets ne sont plus coupés : faites défiler pour lire tout le verset, avec la référence biblique à la fin. L’écran reste allumé plus longtemps à votre propre luminosité au lieu de passer au maximum.
 
 ## Support
 
