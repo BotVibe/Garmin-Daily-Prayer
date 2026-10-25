@@ -16,6 +16,7 @@ REQUIRED_FILES = [
     "source/VerseApi.mc",
     "source/VerseCache.mc",
     "source/VerseView.mc",
+    "source/VerseScroll.mc",
     "source/SettingsMenu.mc",
     "source/Translations.mc",
     "source/AppConfig.mc",

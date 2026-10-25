@@ -83,6 +83,12 @@ def test_verse_view_exits_on_back_not_select() -> None:
     assert "System.exit()" not in select.group(1)
     assert "keepLit()" in select.group(1) or "pokeBacklight()" in select.group(1)
     assert "Attention has :backlight" in text
+    # Boolean true = system backlight level; never force max brightness (1.0).
+    assert "Attention.backlight(true)" in text
+    assert "Attention.backlight(1.0)" not in text
+    assert "onNextPage" in text
+    assert "onPreviousPage" in text
+    assert "scrollBy" in text
 
 
 def test_reminder_scheduler_uses_local_clock_not_utc_moment() -> None:

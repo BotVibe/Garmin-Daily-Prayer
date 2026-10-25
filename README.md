@@ -18,7 +18,7 @@ Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lä
 1. **Erinnerungen** – Bis zu drei **lokale** Uhrzeiten (einzeln aktivierbar). Jeder aktive Slot feuert **einmal pro Kalendertag** zur HH:MM der Uhr (Zeitzone/DST der Uhr). Deaktivierte Slots feuern nie (ihre gespeicherten Zeiten zählen nicht).
 2. **Ablehnen** – Es passiert nichts; die Uhr läuft normal weiter. Die nächste Erinnerung wird trotzdem geplant. Keine Catch-up-/Doppel-Alerts außerhalb eines fälligen Slots.
 3. **Annehmen** – Die App öffnet die Vers-Ansicht mit dem Spruch des Tages.
-4. **Ausblenden** – Nur die **Zurück**-Taste beendet die App → Zifferblatt. Tippen/Select beendet nicht; sie halten die Anzeige länger hell (soweit die Plattform das erlaubt).
+4. **Ausblenden** – Nur die **Zurück**-Taste beendet die App → Zifferblatt. Tippen/Select beendet nicht; sie halten die Anzeige länger hell auf der **Systemhelligkeit** (soweit die Plattform das erlaubt). Lange Verse: nach oben/unten wischen bzw. UP/DOWN-Tasten scrollen (Referenz am Ende); kurze Verse unverändert.
 5. **Manuell** – App im Apps-Menü starten → Vers wird sofort geladen (Cache bevorzugt).
 6. **Einstellungen** – Sprache, Bibelübersetzung nur der gewählten Sprache (inkl. **Zufällig**), Erinnerungszeiten per Stunden-/Minuten-Rad – on-device und (eingeschränkt) in Garmin Connect Mobile.
 7. **Energieeffizienz** – Ein TemporalEvent nur für die *nächste* Zeit, Tages-Cache, dunkles OLED-freundliches UI, kein Polling.
@@ -37,7 +37,8 @@ requestApplicationWake  ──Ablehnen──►  Uhr normal / nächste Zeit gepl
         ▼
    VerseView (Spruch)
         │
-   Tippen/Select → Display hell halten (kein Exit)
+   Tippen/Select → Display hell halten (Systemhelligkeit, kein Exit)
+   Wischen / UP·DOWN → langen Vers scrollen (falls nötig)
    Zurück → App beendet → Watchface
 
 Apps-Menü → App starten → VerseView (manuell)
@@ -122,7 +123,8 @@ source/
   DailyVerseApp.mc       App-Entry, Background-Hook, Settings-Change
   BackgroundService.mc   TemporalEvent → due? Wake : idle → exit
   ReminderScheduler.mc   Nächstes Moment aus aktiven Slots + Due-Check
-  VerseView.mc           Vers-UI + Delegate (Exit / Menü)
+  VerseView.mc           Vers-UI + Delegate (Exit / Menü / Scroll)
+  VerseScroll.mc         Scroll-Offset / Seitengröße (reine Helpers)
   HomeView.mc            Optionaler Brand-Screen (nicht Default-Entry)
   SettingsMenu.mc        On-Device-Menüs + Zeit-Picker
   NumberFactory.mc       Picker-Spalten (Stunde/Minute)
@@ -142,7 +144,8 @@ source/
 - Minimum **5 Minuten** Abstand zu `Time.now` **und** zum letzten TemporalEvent (`getLastTemporalEventTime`). Erwartete Genauigkeit: typisch wenige Minuten um die Soll-Minute; bis ~5 Min verspätet, wenn die 5‑Min-Regel greift, plus OS-Wake-Latenz.
 - Fetch nur im **Foreground** nach App-Start; Background lädt keine Verse und erzeugt keine Alerts außerhalb fälliger Erinnerungen.
 - Cache-Schlüssel: Datum + Sprache + Übersetzungseinstellung.
-- Anzeige hell halten: `Attention.backlight` (Feature-Check); auf OLED ~1 Min Continuous-Limit (`BacklightOnTooLongException`). Kein dauerhaftes Erzwingen der Helligkeit über die Systemeinstellung hinaus.
+- Anzeige hell halten: `Attention.backlight(true)` (Feature-Check) — Boolean **true** = Systemhelligkeit der Uhr, kein Float-Maximum. Auf OLED ~1 Min Continuous-Limit (`BacklightOnTooLongException`). Tippen setzt den Dim-Timer zurück; Auto-Repeat ~40 s, dann System-Timeout.
+- Lange Verse: Scroll statt „…“-Abschneiden (`onNextPage`/`onPreviousPage` = Wischen bzw. Tasten). Bibelstelle nach dem Vers-Text; kurzer Chevron-Hinweis wenn noch Text folgt.
 
 ### Berechtigungen
 
