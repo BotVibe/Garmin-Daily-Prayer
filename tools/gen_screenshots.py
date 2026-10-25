@@ -105,6 +105,60 @@ def render_verse_en() -> Image.Image:
     return finish(image)
 
 
+LONG_VERSE_EN = (
+    "The LORD will be king over the whole earth. "
+    "On that day there will be one LORD, and his name the only name. "
+    "All the land will be changed into a plain from Geba to Rimmon "
+    "south of Jerusalem. But Jerusalem will be raised up and remain "
+    "in its place, from the Benjamin Gate to the site of the First Gate, "
+    "to the Corner Gate, and from the Tower of Hananel to the royal winepresses. "
+    "It will be inhabited; never again will it be destroyed. "
+    "Jerusalem will be secure."
+)
+
+
+def render_verse_long_scrolled(*, at_bottom: bool = False, size: int = SIZE) -> Image.Image:
+    """Long verse in scroll mode: reference only after the verse text."""
+    global SIZE
+    old = SIZE
+    SIZE = size
+    try:
+        image = verse_background()
+        draw = ImageDraw.Draw(image)
+        face = font(18 if size <= 360 else 20)
+        width = int(SIZE * 0.76)
+        verse_lines = wrap(draw, LONG_VERSE_EN, face, width)
+        ref_lines = wrap(draw, "Zechariah 14:9-11", face, width)
+        lines: list[tuple[str, tuple[int, int, int]]] = [(ln, WHITE) for ln in verse_lines]
+        lines.append(("", WHITE))
+        lines.extend((ln, GOLD) for ln in ref_lines)
+
+        top = int(SIZE * 0.18)
+        bottom = int(SIZE * 0.84)
+        line_h = 26 if size <= 360 else 28
+        hint_h = 12
+        visible = max(1, (bottom - top - hint_h) // line_h)
+        max_off = max(0, len(lines) - visible)
+        offset = max_off if at_bottom else 0
+        y = top
+        for text, fill in lines[offset : offset + visible]:
+            if text:
+                box = draw.textbbox((0, 0), text, font=face)
+                draw.text(((SIZE - (box[2] - box[0])) / 2, y), text, font=face, fill=fill)
+            y += line_h
+
+        if offset + visible < len(lines):
+            cx = SIZE // 2
+            hy = bottom - 4
+            draw.line((cx - 5, hy - 6, cx, hy), fill=GRAY, width=2)
+            draw.line((cx, hy, cx + 5, hy - 6), fill=GRAY, width=2)
+
+        draw_centered(draw, ["NIV"], font(14), int(SIZE * 0.88), GRAY, 0)
+        return finish(image)
+    finally:
+        SIZE = old
+
+
 def render_verse_long_reference(*, size: int = SIZE) -> Image.Image:
     """Verse screen with a long reference that wraps (round layout preview)."""
     global SIZE
@@ -262,6 +316,8 @@ def main() -> None:
         "time-picker-390.png": render_time_picker(9, 0),
         "long-reference-360.png": render_verse_long_reference(size=360),
         "long-reference-454.png": render_verse_long_reference(size=454),
+        "long-verse-scroll-top-390.png": render_verse_long_scrolled(at_bottom=False, size=390),
+        "long-verse-scroll-bottom-390.png": render_verse_long_scrolled(at_bottom=True, size=390),
     }
     for name, image in pr_shots.items():
         path = pr_out / name

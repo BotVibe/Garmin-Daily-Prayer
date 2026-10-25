@@ -24,7 +24,7 @@ UI-Default: **Englisch** (`resources`). Weitere UI-Sprachen: Deutsch (`resources
 1. **App-Typ bleibt `watch-app`.** Kein Widget/Glance als Ersatz für den Wake-Flow (Widgets sind auf Zielgeräten oft abgekündigt; Wake braucht die App).
 2. **Nur ein TemporalEvent.** Immer die *nächste* **aktivierte** Slot-Zeit schedulen (`ReminderScheduler.scheduleNext`). Niemals Intervall-Polling. Niemals eine Nicht-Slot-Zeit (z. B. `now+5min`) als Wake registrieren.
 3. **Ablehnen = Idle.** Kein automatisches erneutes Öffnen; nächste Erinnerung trotzdem planen (im Background vor/bei Wake). **`requestApplicationWake` nur wenn `isReminderDueNow`** (lokale Zeit nahe einem aktivierten Slot); sonst nur neu schedulen und exit.
-4. **Nur Zurück in VerseView beendet die App** (`System.exit`) → normales Watchface. Select/Tap beendet **nicht**; sie halten die Anzeige hell (`Attention.backlight`, wo unterstützt).
+4. **Nur Zurück in VerseView beendet die App** (`System.exit`) → normales Watchface. Select/Tap beendet **nicht**; sie halten die Anzeige hell (`Attention.backlight(true)` = Systemhelligkeit, nie erzwungenes Maximum). Lange Verse scrollen (`onNextPage`/`onPreviousPage`: Wischen bzw. UP/DOWN); kurze Verse behalten das feste Layout.
 5. **API:** Plaintext `https://dailyverses.net/get/verse?language=<code>`. Der Website-`verse.js`-Embed ist dokumentiert, aber nicht der Primärpfad.
 6. **`language` Query-Param = Übersetzungscode** (z. B. `lut`), nicht ISO-Sprachcode. Gespeichert wird die Katalog-Position `languageIndex`.
 7. **Übersetzung „Zufällig“** (`translationIndex` 0, intern `random`): stabile Tageswahl aus Codes der Sprache; Ergebnis cachen.
@@ -42,7 +42,7 @@ UI-Default: **Englisch** (`resources`). Weitere UI-Sprachen: Deutsch (`resources
 | Vers laden | `source/VerseApi.mc`, `source/VerseCache.mc` |
 | Katalog | `source/Translations.mc` |
 | Properties | `source/AppConfig.mc`, `resources/properties/properties.xml`, `resources/settings/settings.xml` |
-| UI Vers | `source/VerseView.mc`, `resources/layouts/verse.xml`, `resources-round-*/` |
+| UI Vers | `source/VerseView.mc`, `source/VerseScroll.mc`, `resources/layouts/verse.xml`, `resources-round-*/` |
 | UI Home (optional) | `source/HomeView.mc` (Default-Entry ist VerseView) |
 | UI Settings | `source/SettingsMenu.mc`, `source/NumberFactory.mc` (Zeit-Picker) |
 | Strings | `resources/strings/strings.xml` (EN), `resources-deu/…`, `resources-fre/…` |
@@ -95,8 +95,9 @@ Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` üb
 | API-URL oder Parse-Format | `VerseApi.mc`, `tools/dailyverse_lib/parse.py`, `tests/test_verse_parse.py`, **README**, **AGENTS** |
 | Katalog Sprache/Übersetzung | `Translations.mc`, Settings/Strings, `tools/dailyverse_lib/catalog.py`, `tests/test_catalog_consistency.py`, **README**, **AGENTS** |
 | Reminder-Algorithmus | `ReminderScheduler.mc`, `tools/dailyverse_lib/reminder.py`, `tests/test_reminder_schedule.py`, **README**, **AGENTS** |
+| Vers-Scroll / Wrap | `VerseView.mc`, `VerseScroll.mc`, `tools/dailyverse_lib/verse_layout.py`, `tests/test_verse_layout.py`, **README**, **AGENTS** |
 | Neue Geräte | `manifest.xml`, **README** Geräte-Liste |
-| UI-Flow (Exit, Menü, Wake) | Views/Delegates, **README** Nutzerfluss, **AGENTS** Invarianten |
+| UI-Flow (Exit, Menü, Wake, Scroll, Backlight) | Views/Delegates, **README** Nutzerfluss, **AGENTS** Invarianten |
 | Default-Properties | `properties.xml`, **README** Defaults |
 
 ### Doc-Update-Checkliste (vor Commit)
@@ -139,7 +140,8 @@ Erinnerungszeiten sind **lokale Wanduhrzeit** der Uhr (`momentForLocalClock` üb
 - Sprach-Ressourcen nicht per `deu.resourcePath` / `fre.resourcePath` anhängen. Der Default-Jungle mappt `resources-<lang>` auf `base.lang.<lang>` (Default-Strings = Englisch in `resources/`).
 - Connect-Settings vom Typ `list` akzeptieren nur numerische `listEntry`-Werte und können nicht von einer anderen Setting abhängen. `settings.xml` kommt aus `tools/gen_settings.py`.
 - Layouts erzeugen Custom-Drawables mit einem Parameter-Dictionary. `initialize(params)` muss es an `Drawable.initialize` weiterreichen.
-- `Attention.backlight`: Feature-Check (`Attention has :backlight`); auf OLED kann längeres Halten `BacklightOnTooLongException` werfen (~1 Min). System-Timeout der Hintergrundbeleuchtung bleibt maßgeblich; die App kann nur erneut anstoßen, nicht dauerhaft erzwingen.
+- `Attention.backlight`: Feature-Check (`Attention has :backlight`); **`backlight(true)`** hält die Anzeige auf der **Systemhelligkeit** (Boolean = Gerätelevel). Float-Werte (z. B. `1.0`) würden die Helligkeit explizit setzen und sind unerwünscht. Auf OLED kann längeres Halten `BacklightOnTooLongException` werfen (~1 Min). System-Timeout der Hintergrundbeleuchtung bleibt maßgeblich; die App kann nur erneut anstoßen, nicht dauerhaft erzwingen.
+- Lange Verse: wenn der Text selbst bei `FONT_XTINY` nicht in die Verse-TextArea passt → Scroll-Modus (`VerseScroll` + manuelles Word-Wrap). Referenz erst nach dem Vers-Text; Chevron „mehr unten“. Short-Pfad unverändert (Layout-TextAreas).
 
 ---
 

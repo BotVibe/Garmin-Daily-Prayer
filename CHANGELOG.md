@@ -9,6 +9,8 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ### Changed
 
+- Verse screen backlight now uses `Attention.backlight(true)` so the display stays lit longer at the **watch’s system brightness**. It no longer forces maximum brightness (`1.0`). OLED burn-in limits (~1 minute continuous) are still respected.
+- Long verses that do not fit on one screen are **scrollable** (swipe up/down on touch devices; UP/DOWN → next/previous page on button devices) instead of truncating with “…”. The Bible reference follows the verse text at the end of the scroll. Short verses keep the existing fixed layout. A small chevron hints when more text is below.
 - Watch UI and Connect settings follow the watch language: **English** (default `resources`), **German** (`resources-deu`), **French** (`resources-fre`). Removed `resources-eng`; English no longer falls back to German on non-English watches.
 - Store listings exist in English (master), German, and French; store screenshots show the English UI.
 
