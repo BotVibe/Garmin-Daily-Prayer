@@ -30,6 +30,8 @@ Le verset est enregistré pour le jour en cours. Sans connexion au téléphone, 
 
 Source : https://dailyverses.net/
 
+Code source : https://github.com/BotVibe/Garmin-Daily-Prayer
+
 ## Mots-clés
 
 Bible, verset, verset du jour, dévotion, prière, rappel, Daily Verse, DailyVerses

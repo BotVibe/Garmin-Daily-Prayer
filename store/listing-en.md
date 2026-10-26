@@ -32,6 +32,8 @@ The verse is stored for the current day. With no phone connection the app shows 
 
 Source: https://dailyverses.net/
 
+Source code: https://github.com/BotVibe/Garmin-Daily-Prayer
+
 ## Keywords
 
 Bible, verse, verse of the day, devotion, prayer, reminder, Daily Verse, DailyVerses

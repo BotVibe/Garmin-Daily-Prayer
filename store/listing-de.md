@@ -32,6 +32,8 @@ Der Vers wird für den aktuellen Tag gespeichert. Ohne Verbindung zum Telefon ze
 
 Quelle: https://dailyverses.net/
 
+Quellcode: https://github.com/BotVibe/Garmin-Daily-Prayer
+
 ## Schlüsselwörter
 
 Bibel, Bibelvers, Vers des Tages, Andacht, Gebet, Erinnerung, Daily Verse, DailyVerses
