@@ -7,6 +7,16 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-26
+
+### Fixed
+
+- Version in the phone settings (Garmin Connect / Connect IQ app) stayed at the first installed version (e.g. 1.0.0 although 1.2.0 was installed). The read-only `appVersion` setting is a stored property, and stored values survive app updates. The app now overwrites it with the packaged version (`Rez.Strings.AppVersion`) when it opens and after settings arrive from the phone. The watch menu already showed the correct version.
+
+### Changed
+
+- README links to the Connect IQ Store page; the store descriptions (EN/DE/FR) link to the source code on GitHub.
+
 ## [1.2.0] - 2026-10-25
 
 ### Changed

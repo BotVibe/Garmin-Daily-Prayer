@@ -1,13 +1,13 @@
 # Daily Verse
 
-Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lädt den Vers des Tages von [DailyVerses.net](https://dailyverses.net/), erinnert zu konfigurierbaren Uhrzeiten und zeigt den Vers auf der Uhr. Der Name der App ist in jeder Sprache **Daily Verse**. Version **1.2.0**, kostenlos.
+Energieeffiziente **Garmin Connect IQ Watch-App** (Bibelvers des Tages). Sie lädt den Vers des Tages von [DailyVerses.net](https://dailyverses.net/), erinnert zu konfigurierbaren Uhrzeiten und zeigt den Vers auf der Uhr. Der Name der App ist in jeder Sprache **Daily Verse**. Version **1.2.1**, kostenlos.
 
 **Download:** [Daily Verse im Connect IQ Store](https://apps.garmin.com/apps/ffb0079d-7440-4b08-883b-27a4330d5d97)
 
 | | |
 | --- | --- |
 | Typ | Connect IQ **watch-app** (Apps-Menü) |
-| Version | **1.2.0** |
+| Version | **1.2.1** |
 | API | `https://dailyverses.net/get/verse?language=<code>` |
 | Min. API | Connect IQ **4.0.0** |
 | Sprachen UI | Englisch (Default), Deutsch, Französisch (folgt der Uhrensprache) |
@@ -73,7 +73,7 @@ Dieselben Properties (`languageIndex`, `translationIndex`, Slot-Flags/Zeiten) si
 | --- | --- |
 | Sprache | `languageIndex` **6** → `de` (Deutsch) |
 | Übersetzung | `translationIndex` **13** → `lut` (Luther 2017) |
-| Version | `appVersion` `1.2.0` (nur Anzeige) |
+| Version | `appVersion` `1.2.1` (nur Anzeige; die App überschreibt den gespeicherten Wert beim Öffnen mit der installierten Version) |
 | Slot 1 | **an**, 08:00 |
 | Slot 2 | aus, 12:00 |
 | Slot 3 | aus, 20:00 |

@@ -40,7 +40,7 @@ Bible, verse, verse of the day, devotion, prayer, reminder, Daily Verse, DailyVe
 
 ## What's New
 
-The app and its settings are now available in English, German and French. Long verses are no longer cut off: scroll to read the whole verse, with the Bible reference at the end. The screen stays on longer at your own brightness instead of switching to maximum.
+The version number in the settings is now always shown correctly.
 
 ## Support
 

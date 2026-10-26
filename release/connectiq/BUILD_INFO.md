@@ -7,16 +7,16 @@ upload has to sign every later update of this app.
 | | |
 | --- | --- |
 | App | Daily Verse |
-| Version | 1.2.0 |
+| Version | 1.2.1 |
 | App id | `5af97fbc-6678-4ebe-8e0a-2cddfca4a32b` |
 | Type | watch-app |
 | Min API | 4.0.0 |
 | SDK | 9.2.0 |
-| Built | 2026-10-25 |
-| Git | tag v1.2.0 (commit "Release 1.2.0", built from `b0ba16a` + version bump + `fre` manifest language) |
+| Built | 2026-10-26 |
+| Git | tag v1.2.1 (commit "Release 1.2.1", built from `8668037` + appVersion sync fix + version bump) |
 | Devices | 28 manifest products, 45/45 device targets built |
 | Package | `release/connectiq/app.iq (not committed)` |
-| SHA-256 | `5e583e2444efd0b6ea49174e4bbf0668efc34433b3b3dd4d963e7d95de23147f` |
+| SHA-256 | `22c0f6a9e750bdbd1a10a9b8d283f810f1b22e94fa93e204eb6a7d649bf85cf9` |
 | Developer key | `~/.config/ciq-release/developer_key.der` (box) |
 | Price | free |
 

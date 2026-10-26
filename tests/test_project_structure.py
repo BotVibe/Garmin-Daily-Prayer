@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+# Single expected release version for every place that carries it.
+APP_VERSION = "1.2.1"
 
 REQUIRED_FILES = [
     "README.md",
@@ -61,11 +65,15 @@ def test_app_name_and_version_are_consistent() -> None:
         root = ET.parse(ROOT / rel).getroot()
         strings = {el.attrib["id"]: (el.text or "") for el in root.findall("string")}
         assert strings["AppName"] == "Daily Verse", rel
-        assert strings["AppVersion"] == "1.2.0", rel
+        assert strings["AppVersion"] == APP_VERSION, rel
     props = ET.parse(ROOT / "resources/properties/properties.xml").getroot()
     version = next(el for el in props.findall("property") if el.attrib["id"] == "appVersion")
-    assert (version.text or "").strip() == "1.2.0"
+    assert (version.text or "").strip() == APP_VERSION
+    manifest = (ROOT / "manifest.xml").read_text(encoding="utf-8")
+    assert f"Version {APP_VERSION}." in manifest
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    released = re.findall(r"^## \[(\d+\.\d+\.\d+)\]", changelog, flags=re.M)
+    assert released and released[0] == APP_VERSION, "newest CHANGELOG section must be the app version"
     assert "## [1.2.0]" in changelog
     assert "## [1.1.0]" in changelog
     assert "## [1.0.0]" in changelog
@@ -119,3 +127,42 @@ def test_manifest_declares_every_resource_language() -> None:
         if (folder / "strings").is_dir():
             assert folder.name.split("-", 1)[1] in langs, folder.name
     assert {"eng", "deu", "fre"} <= langs
+
+
+def _method_body(source: str, name: str) -> str:
+    start = source.index(f"function {name}(")
+    depth = 0
+    for i in range(source.index("{", start), len(source)):
+        if source[i] == "{":
+            depth += 1
+        elif source[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return source[start:i]
+    raise AssertionError(f"unbalanced braces in {name}")
+
+
+def test_app_version_setting_is_resynced_on_start() -> None:
+    """Stored property values survive updates, so the phone kept showing the
+    first installed version. The app must overwrite `appVersion` with
+    Rez.Strings.AppVersion in the foreground, guarded against failures."""
+    app = (ROOT / "source/DailyVerseApp.mc").read_text(encoding="utf-8")
+    config = (ROOT / "source/AppConfig.mc").read_text(encoding="utf-8")
+    assert 'const KEY_APP_VERSION as String = "appVersion";' in config
+
+    sync = _method_body(app, "syncVersionProperty")
+    assert "Rez.Strings.AppVersion" in sync
+    assert "Application has :Properties" in sync
+    assert "try {" in sync and "catch" in sync
+    assert "Properties.setValue(AppConfig.KEY_APP_VERSION" in sync
+    assert ".equals(" in sync, "only write when the stored value differs"
+
+    # Foreground entry points only: WatchUi.loadResource is not available in
+    # the background process, and getInitialView never runs there.
+    assert "syncVersionProperty();" in _method_body(app, "getInitialView")
+    changed = _method_body(app, "onSettingsChanged")
+    assert "if (!_inBackground) {\n            syncVersionProperty();" in changed
+    assert "syncVersionProperty" not in _method_body(app, "onStart")
+    assert "syncVersionProperty" not in _method_body(app, "getServiceDelegate")
+    for rel in ("source/BackgroundService.mc", "source/ReminderScheduler.mc", "source/AppConfig.mc"):
+        assert "Rez.Strings.AppVersion" not in (ROOT / rel).read_text(encoding="utf-8"), rel

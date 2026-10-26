@@ -35,6 +35,8 @@ class DailyVerseApp extends Application.AppBase {
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
+        // Foreground only: getInitialView never runs in the background process.
+        syncVersionProperty();
         var view = new VerseView(false);
         _verseView = view;
         var delegate = new VerseDelegate();
@@ -52,9 +54,37 @@ class DailyVerseApp extends Application.AppBase {
     }
 
     function onSettingsChanged() as Void {
+        // Garmin Connect sends its cached settings back, including a stale
+        // appVersion; restore the real one (foreground only, needs WatchUi).
+        if (!_inBackground) {
+            syncVersionProperty();
+        }
         AppConfig.normalize();
         ReminderScheduler.scheduleNext();
         WatchUi.requestUpdate();
+    }
+
+    //! The read-only `appVersion` setting shown in Garmin Connect is a stored
+    //! property, and stored values survive app updates. Overwrite it with the
+    //! packaged version (Rez.Strings.AppVersion, the single source of truth)
+    //! so the phone shows the installed version instead of the first one.
+    //! Never throws: a failure only leaves the old display value.
+    function syncVersionProperty() as Void {
+        try {
+            if (!(Application has :Properties)) {
+                return;
+            }
+            var actual = WatchUi.loadResource(Rez.Strings.AppVersion);
+            if (!(actual instanceof String)) {
+                return;
+            }
+            var stored = Application.Properties.getValue(AppConfig.KEY_APP_VERSION);
+            if (!(stored instanceof String) || !(stored as String).equals(actual as String)) {
+                Application.Properties.setValue(AppConfig.KEY_APP_VERSION, actual as String);
+            }
+        } catch (e) {
+            // Properties unavailable or key missing: keep running.
+        }
     }
 }
 

@@ -1,6 +1,8 @@
 <properties>
-    <!-- Shown read-only in the settings; keep in sync with CHANGELOG.md. -->
-    <property id="appVersion" type="string">1.2.0</property>
+    <!-- Shown read-only in the settings. Default for fresh installs; the app
+         overwrites it with Rez.Strings.AppVersion on start (stored values
+         survive updates). Keep in sync with AppVersion and CHANGELOG.md. -->
+    <property id="appVersion" type="string">1.2.1</property>
 
     <!-- Catalog position of the language in Translations.languageIds() ("de"). -->
     <property id="languageIndex" type="number">6</property>

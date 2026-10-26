@@ -71,7 +71,7 @@ Keine `WatchUi`-Abhängigkeiten im Background-Pfad.
 | --- | --- | --- |
 | `languageIndex` | number | Position in `Translations.languageIds()` (`6` = `de`) |
 | `translationIndex` | number | `0` = zufällig, sonst Position im Katalog (`13` = `lut`) |
-| `appVersion` | string | Angezeigte Version, nur lesbar in den Settings |
+| `appVersion` | string | Angezeigte Version, nur lesbar in den Settings. Gespeicherte Werte überleben Updates, daher schreibt `DailyVerseApp.syncVersionProperty()` (Foreground: `getInitialView`, `onSettingsChanged`) `Rez.Strings.AppVersion` hinein. Quelle der Wahrheit ist `AppVersion` in den Strings; Default in `properties.xml` gleich halten (Test) |
 | `slotNEnabled` | boolean | N = 1..3 |
 | `slotNHour` | number | 0–23 |
 | `slotNMinute` | number | 0–59 |

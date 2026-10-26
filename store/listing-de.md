@@ -40,7 +40,7 @@ Bibel, Bibelvers, Vers des Tages, Andacht, Gebet, Erinnerung, Daily Verse, Daily
 
 ## Was ist neu
 
-Die App und ihre Einstellungen gibt es jetzt auf Englisch, Deutsch und Französisch. Lange Verse werden nicht mehr abgeschnitten: Scrolle, um den ganzen Vers zu lesen, die Bibelstelle steht am Ende. Die Anzeige bleibt länger in deiner eingestellten Helligkeit an, statt auf Maximum zu schalten.
+Die Versionsnummer in den Einstellungen wird jetzt immer korrekt angezeigt.
 
 ## Support
 

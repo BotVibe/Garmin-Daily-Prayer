@@ -38,7 +38,7 @@ Bible, verset, verset du jour, dévotion, prière, rappel, Daily Verse, DailyVer
 
 ## Nouveautés
 
-L’application et ses réglages sont désormais disponibles en anglais, en allemand et en français. Les longs versets ne sont plus coupés : faites défiler pour lire tout le verset, avec la référence biblique à la fin. L’écran reste allumé plus longtemps à votre propre luminosité au lieu de passer au maximum.
+Le numéro de version dans les paramètres s’affiche désormais toujours correctement.
 
 ## Support
 

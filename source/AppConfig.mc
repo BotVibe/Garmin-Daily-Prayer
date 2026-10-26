@@ -8,6 +8,9 @@ module AppConfig {
 
     const KEY_LANGUAGE as String = "languageIndex";
     const KEY_TRANSLATION as String = "translationIndex";
+    //! Read-only display value in Garmin Connect; DailyVerseApp keeps it equal
+    //! to the packaged AppVersion string (foreground only).
+    const KEY_APP_VERSION as String = "appVersion";
 
     const DEFAULT_LANGUAGE_ID as String = "de";
     const DEFAULT_TRANSLATION_CODE as String = "lut";
